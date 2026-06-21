@@ -1,0 +1,30 @@
+:root {
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* Layout */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 76px;
+  --navbar-height: 76px;
+
+  /* Motion */
+  --transition-fast: 150ms;
+  --transition-base: 220ms;
+  --transition-slow: 360ms;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgb(30 36 51 / 0.06);
+  --shadow-sm: 0 8px 24px rgb(30 36 51 / 0.08);
+  --shadow-md: 0 18px 50px rgb(30 36 51 / 0.1);
+  --shadow-lg: 0 28px 80px rgb(30 36 51 / 0.14);
+
+  /* Z Index */
+  --z-navbar: 50;
+  --z-sidebar: 40;
+  --z-modal: 100;
+  --z-toast: 120;
+}
