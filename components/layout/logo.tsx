@@ -6,8 +6,9 @@ export function Logo() {
       </div>
 
       <div>
-        <h2 className="font-semibold text-sm tracking-tight text-sidebar-foreground">Bookstore CMS</h2>
-
+        <h2 className="font-semibold text-sm tracking-tight text-sidebar-foreground">
+          Bookstore CMS
+        </h2>
         <p className="text-xs text-sidebar-foreground/60">Admin Panel</p>
       </div>
     </div>

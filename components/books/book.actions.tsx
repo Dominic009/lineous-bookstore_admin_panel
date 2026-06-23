@@ -15,12 +15,12 @@ export function BookActions() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="ghost">
+        <Button size="icon" variant="ghost" className="rounded-xl">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="rounded-xl">
         <DropdownMenuItem>
           <Eye className="mr-2 h-4 w-4" />
           View
@@ -31,7 +31,7 @@ export function BookActions() {
           Edit
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="text-red-600">
+        <DropdownMenuItem className="text-destructive">
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>

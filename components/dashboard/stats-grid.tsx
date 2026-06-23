@@ -10,6 +10,7 @@ export function StatsGrid() {
         value="2,540"
         icon={BookOpen}
         change="+12% this month"
+        trend="up"
       />
 
       <StatCard
@@ -17,6 +18,7 @@ export function StatsGrid() {
         value="1,245"
         icon={Users}
         change="+8% this month"
+        trend="up"
       />
 
       <StatCard
@@ -24,6 +26,7 @@ export function StatsGrid() {
         value="432"
         icon={ShoppingCart}
         change="+14% this month"
+        trend="up"
       />
 
       <StatCard
@@ -31,6 +34,7 @@ export function StatsGrid() {
         value="$18,420"
         icon={DollarSign}
         change="+22% this month"
+        trend="up"
       />
     </div>
   );

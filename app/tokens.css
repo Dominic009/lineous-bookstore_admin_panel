@@ -1,30 +1,59 @@
 :root {
-  /* Radius */
+  /* ===== RADIUS SYSTEM ===== */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
   --radius-xl: 24px;
 
-  /* Layout */
+  /* ===== LAYOUT ===== */
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 76px;
   --navbar-height: 76px;
 
-  /* Motion */
+  /* ===== MOTION ===== */
   --transition-fast: 150ms;
   --transition-base: 220ms;
   --transition-slow: 360ms;
 
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgb(30 36 51 / 0.06);
-  --shadow-sm: 0 8px 24px rgb(30 36 51 / 0.08);
-  --shadow-md: 0 18px 50px rgb(30 36 51 / 0.1);
-  --shadow-lg: 0 28px 80px rgb(30 36 51 / 0.14);
+  /* ===== SHADOWS ===== */
+  --shadow-xs: 0 1px 2px rgb(30 36 51 / 0.04);
+  --shadow-sm: 0 2px 8px rgb(30 36 51 / 0.06), 0 1px 2px rgb(30 36 51 / 0.04);
+  --shadow-md: 0 8px 24px rgb(30 36 51 / 0.08), 0 2px 8px rgb(30 36 51 / 0.04);
+  --shadow-lg: 0 16px 48px rgb(30 36 51 / 0.12), 0 4px 16px rgb(30 36 51 / 0.06);
+  --shadow-xl: 0 24px 64px rgb(30 36 51 / 0.16), 0 8px 24px rgb(30 36 51 / 0.08);
 
-  /* Z Index */
+  /* ===== Z INDEX ===== */
   --z-navbar: 50;
   --z-sidebar: 40;
   --z-modal: 100;
   --z-toast: 120;
+
+  /* ===== TYPOGRAPHY ===== */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* ===== SPACING ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
 }
