@@ -10,7 +10,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-72 border-r bg-sidebar text-sidebar-foreground lg:flex lg:flex-col">
+    <aside className="hidden w-72 border-r bg-sidebar text-sidebar-foreground lg:flex lg:flex-col sticky top-0 h-dvh">
       <div className="border-b border-sidebar-border p-6">
         <Logo />
       </div>
@@ -32,7 +32,7 @@ export function Sidebar() {
 
                   active
                     ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-ring/20"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )}
               >
                 <Icon className="h-5 w-5" />

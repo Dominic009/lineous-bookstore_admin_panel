@@ -16,13 +16,13 @@ import {
 export const navigation = [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/admin/dashboard",
     icon: LayoutDashboard,
   },
 
   {
     title: "Books",
-    href: "/books",
+    href: "/admin/books",
     icon: BookOpen,
   },
 
