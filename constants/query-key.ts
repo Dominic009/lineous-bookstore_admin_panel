@@ -7,6 +7,8 @@ export const QueryKeys = {
 
     publications: ["publications"],
 
+    subjects: ["subjects"],
+
     teachers: ["teachers"],
 
     categories: ["categories"],

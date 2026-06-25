@@ -1,36 +1,62 @@
+"use client";
+
 import Image from "next/image";
+import { toast } from "sonner";
 
 import { StatusBadge } from "./status-badge";
 import { BookActions } from "./book.actions";
+import { useBooks, useDeleteBook } from "@/lib/hooks/use-books";
+import type { Book } from "@/lib/types/book";
 
-const books = [
-  {
-    id: 1,
-    title: "Advanced Mathematics",
-    isbn: "978123456",
-    price: "$25",
-    stock: 42,
-    status: "PUBLISHED" as const,
-  },
-  {
-    id: 2,
-    title: "Physics Essentials",
-    isbn: "978444555",
-    price: "$18",
-    stock: 12,
-    status: "DRAFT" as const,
-  },
-  {
-    id: 3,
-    title: "Chemistry Handbook",
-    isbn: "978777999",
-    price: "$30",
-    stock: 8,
-    status: "ARCHIVED" as const,
-  },
-] as const;
+interface BooksTableProps {
+  onEdit?: (book: Book) => void;
+  onDelete?: (book: Book) => void;
+}
 
-export function BooksTable() {
+export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
+  const { data: books, isLoading, error } = useBooks();
+  const deleteMutation = useDeleteBook();
+
+  const handleDelete = async (book: Book) => {
+    try {
+      await deleteMutation.mutateAsync(book.id);
+      toast.success("Book deleted successfully");
+      onDelete?.(book);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Failed to delete book";
+      toast.error(errorMessage);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : "Failed to load books";
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-destructive">{errorMessage}</p>
+      </div>
+    );
+  }
+
+  if (!books || books.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-muted-foreground">No books found</p>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
       <table className="w-full">
@@ -54,27 +80,40 @@ export function BooksTable() {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
                   <div className="flex h-14 w-10 items-center justify-center rounded-lg bg-muted/50">
-                    <Image
-                      src="https://placehold.co/60x80"
-                      alt=""
-                      width={40}
-                      height={56}
-                      className="rounded-md object-cover"
-                    />
+                    {book.thumbnail ? (
+                      <Image
+                        src={book.thumbnail}
+                        alt={book.title}
+                        width={40}
+                        height={56}
+                        className="rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="text-xs text-muted-foreground">No Image</div>
+                    )}
                   </div>
 
                   <div>
                     <h4 className="font-medium">{book.title}</h4>
-                    <p className="text-sm text-muted-foreground">Science</p>
+                    <p className="text-sm text-muted-foreground">
+                      {book.subject?.name || "Uncategorized"}
+                    </p>
                   </div>
                 </div>
               </td>
 
               <td className="px-6 py-4 text-sm text-muted-foreground">
-                {book.isbn}
+                {book.isbn || "-"}
               </td>
 
-              <td className="px-6 py-4 text-sm font-medium">{book.price}</td>
+              <td className="px-6 py-4 text-sm font-medium">
+                ${book.price.toFixed(2)}
+                {book.discountPrice && (
+                  <span className="ml-2 text-xs text-muted-foreground line-through">
+                    ${book.discountPrice.toFixed(2)}
+                  </span>
+                )}
+              </td>
 
               <td className="px-6 py-4 text-sm">{book.stock}</td>
 
@@ -83,7 +122,10 @@ export function BooksTable() {
               </td>
 
               <td className="px-6 py-4">
-                <BookActions />
+                <BookActions 
+                  onEdit={() => onEdit?.(book)}
+                  onDelete={() => handleDelete(book)}
+                />
               </td>
             </tr>
           ))}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, JetBrains_Mono, Manrope } from "next/font/google";
 import { AuthProvider } from "@/contexts/auth-context";
+import { QueryClientProvider } from "@/components/providers/query-client";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -34,9 +35,11 @@ export default function RootLayout({
       className={`${manrope.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased font-sans`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <QueryClientProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

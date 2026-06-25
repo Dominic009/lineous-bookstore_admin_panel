@@ -11,7 +11,12 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-export function BookActions() {
+interface BookActionsProps {
+  onEdit?: () => void;
+  onDelete?: () => void;
+}
+
+export function BookActions({ onEdit, onDelete }: BookActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,12 +31,12 @@ export function BookActions() {
           View
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onEdit}>
           <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="text-destructive">
+        <DropdownMenuItem className="text-destructive" onClick={onDelete}>
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
