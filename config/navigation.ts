@@ -40,13 +40,13 @@ export const navigation = [
 
   {
     title: "Publications",
-    href: "/publications",
+    href: "/admin/publications",
     icon: Building2,
   },
 
   {
     title: "Subjects",
-    href: "/subjects",
+    href: "/admin/subjects",
     icon: Library,
   },
 

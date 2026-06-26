@@ -9,9 +9,11 @@ export interface Publication {
   name: string;
   slug: string;
   description?: string;
+  logo?: string;
   status: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
 }
 
 export interface Subject {
@@ -21,6 +23,7 @@ export interface Subject {
   description?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string;
 }
 
 export interface BookAttachment {
@@ -94,6 +97,36 @@ export interface UpdateBookDto {
   status?: BookStatus;
   publicationId?: string;
   subjectId?: string;
+}
+
+// Publication DTOs
+export interface CreatePublicationDto {
+  name: string;
+  slug: string;
+  description?: string;
+  logo?: string;
+  status?: BookStatus;
+}
+
+export interface UpdatePublicationDto {
+  name?: string;
+  slug?: string;
+  description?: string;
+  logo?: string;
+  status?: BookStatus;
+}
+
+// Subject DTOs
+export interface CreateSubjectDto {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+export interface UpdateSubjectDto {
+  name?: string;
+  slug?: string;
+  description?: string;
 }
 
 // API Response types
