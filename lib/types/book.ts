@@ -46,7 +46,8 @@ export interface Book {
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock: number;
+  stock?: boolean;
+  stockAmount?: number;
   status: BookStatus;
   thumbnail?: string;
   publicationId?: string;
@@ -70,7 +71,8 @@ export interface CreateBookDto {
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: number;
+  stock?: boolean;
+  stockAmount?: number;
   status?: BookStatus;
   publicationId?: string;
   subjectId?: string;
@@ -87,7 +89,8 @@ export interface UpdateBookDto {
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: number;
+  stock?: boolean;
+  stockAmount?: number;
   status?: BookStatus;
   publicationId?: string;
   subjectId?: string;

@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout({
   children,
@@ -9,7 +10,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-muted/20">
+      <div className="flex min-h-screen bg-white">
         <Sidebar />
 
         <div className="flex flex-1 flex-col">
@@ -20,6 +21,7 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
+      <Toaster />
     </ProtectedRoute>
   );
 }

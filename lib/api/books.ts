@@ -15,11 +15,7 @@ export const getBook = async (id: string): Promise<ApiResponse<Book>> => {
 
 // Create book with FormData (for file uploads)
 export const createBook = async (formData: FormData): Promise<ApiResponse<Book>> => {
-  const response = await apiClient.post<ApiResponse<Book>>("/books", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await apiClient.post<ApiResponse<Book>>("/books", formData);
   return response.data;
 };
 

@@ -33,7 +33,7 @@ export function RecentBooks() {
           {books.map((book) => (
             <div
               key={book.isbn}
-              className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+              className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
             >
               <div className="space-y-1">
                 <h4 className="font-medium">{book.title}</h4>

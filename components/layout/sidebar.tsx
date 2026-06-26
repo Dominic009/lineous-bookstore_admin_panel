@@ -32,7 +32,7 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+                  "group flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-all duration-200",
                   active
                     ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-ring/20"
                     : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -47,7 +47,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-sidebar-border/60 p-4">
-        <div className="rounded-xl bg-sidebar-accent/50 p-4">
+        <div className="rounded-md bg-sidebar-accent/50 p-4">
           <p className="text-xs text-sidebar-foreground/60">
             Bookstore CMS v1.0
           </p>

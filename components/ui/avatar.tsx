@@ -17,7 +17,7 @@ function Avatar({
       data-slot="avatar"
       data-size={size}
       className={cn(
-        "group/avatar relative flex size-10 shrink-0 rounded-xl select-none after:absolute after:inset-0 after:rounded-xl after:border after:border-border after:mix-blend-darken data-[size=lg]:size-12 data-[size=sm]:size-8 dark:after:mix-blend-lighten",
+        "group/avatar relative flex size-10 shrink-0 rounded-md select-none after:absolute after:inset-0 after:rounded-md after:border after:border-border after:mix-blend-darken data-[size=lg]:size-12 data-[size=sm]:size-8 dark:after:mix-blend-lighten",
         className
       )}
       {...props}
@@ -33,7 +33,7 @@ function AvatarImage({
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn(
-        "aspect-square size-full rounded-xl object-cover",
+        "aspect-square size-full rounded-md object-cover",
         className
       )}
       {...props}
@@ -49,7 +49,7 @@ function AvatarFallback({
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
+        "flex size-full items-center justify-center rounded-md bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
         className
       )}
       {...props}
@@ -94,7 +94,7 @@ function AvatarGroupCount({
     <div
       data-slot="avatar-group-count"
       className={cn(
-        "relative flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-12 group-has-data-[size=sm]/avatar-group:size-8 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3",
+        "relative flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-12 group-has-data-[size=sm]/avatar-group:size-8 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3",
         className
       )}
       {...props}

@@ -20,12 +20,12 @@ export function BookActions({ onEdit, onDelete }: BookActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="ghost" className="rounded-xl">
+        <Button size="icon" variant="ghost" className="rounded-md">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="rounded-xl">
+      <DropdownMenuContent align="end" className="rounded-md">
         <DropdownMenuItem>
           <Eye className="mr-2 h-4 w-4" />
           View

@@ -16,7 +16,7 @@ function Command({
       data-slot="command"
       role="command"
       className={cn(
-        "flex h-full w-full flex-col overflow-hidden rounded-xl bg-background text-popover-foreground",
+        "flex h-full w-full flex-col overflow-hidden rounded-md bg-background text-popover-foreground",
         className
       )}
       {...props}

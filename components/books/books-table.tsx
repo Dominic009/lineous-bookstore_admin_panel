@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { toast } from "sonner";
 
 import { StatusBadge } from "./status-badge";
 import { BookActions } from "./book.actions";
@@ -18,16 +17,8 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
   const deleteMutation = useDeleteBook();
 
   const handleDelete = async (book: Book) => {
-    try {
-      await deleteMutation.mutateAsync(book.id);
-      toast.success("Book deleted successfully");
-      onDelete?.(book);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Failed to delete book";
-      toast.error(errorMessage);
-    }
+    await deleteMutation.mutateAsync(book.id);
+    onDelete?.(book);
   };
 
   if (isLoading) {
@@ -39,9 +30,8 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
   }
 
   if (error) {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : "Failed to load books";
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to load books";
     return (
       <div className="flex h-64 items-center justify-center">
         <p className="text-destructive">{errorMessage}</p>
@@ -62,11 +52,21 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">Book</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">ISBN</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Price</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Stock</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Status</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Book
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              ISBN
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Price
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Stock
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Status
+            </th>
             <th className="px-6 py-4 font-medium text-muted-foreground"></th>
           </tr>
         </thead>
@@ -89,7 +89,9 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
                         className="rounded-md object-cover"
                       />
                     ) : (
-                      <div className="text-xs text-muted-foreground">No Image</div>
+                      <div className="text-xs text-muted-foreground">
+                        No Image
+                      </div>
                     )}
                   </div>
 
@@ -107,10 +109,10 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
               </td>
 
               <td className="px-6 py-4 text-sm font-medium">
-                ${book.price.toFixed(2)}
+                ${book.price}
                 {book.discountPrice && (
                   <span className="ml-2 text-xs text-muted-foreground line-through">
-                    ${book.discountPrice.toFixed(2)}
+                    ${book.discountPrice}
                   </span>
                 )}
               </td>
@@ -122,7 +124,7 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
               </td>
 
               <td className="px-6 py-4">
-                <BookActions 
+                <BookActions
                   onEdit={() => onEdit?.(book)}
                   onDelete={() => handleDelete(book)}
                 />

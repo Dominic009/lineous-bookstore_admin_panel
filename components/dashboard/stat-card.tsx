@@ -24,7 +24,7 @@ export function StatCard({ title, value, icon: Icon, change, trend = "up" }: Sta
             )}
           </div>
 
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110">
             <Icon className="h-6 w-6" />
           </div>
         </div>

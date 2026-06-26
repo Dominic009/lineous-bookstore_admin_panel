@@ -118,7 +118,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="mb-6 rounded-xl bg-destructive/10 p-4 text-sm text-destructive">
+              <div className="mb-6 rounded-md bg-destructive/10 p-4 text-sm text-destructive">
                 {error}
               </div>
             )}
@@ -131,7 +131,7 @@ export default function LoginPage() {
                   placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 rounded-xl border-border/60 bg-muted/30"
+                  className="h-12 rounded-md border-border/60 bg-muted/30"
                   required
                 />
               </div>
@@ -143,7 +143,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 rounded-xl border-border/60 bg-muted/30"
+                  className="h-12 rounded-md border-border/60 bg-muted/30"
                   required
                 />
               </div>
@@ -169,7 +169,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="h-12 w-full rounded-xl text-base"
+                className="h-12 w-full rounded-md text-base"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Login"}

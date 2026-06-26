@@ -37,7 +37,7 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       className={cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-xl border border-border/60 bg-muted/30 px-3.5 py-2.5 text-sm transition-all duration-200",
+        "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-border/60 bg-muted/30 px-3.5 py-2.5 text-sm transition-all duration-200",
         "focus:outline-none focus:ring-[3px] focus:ring-ring/50",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -64,7 +64,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border/60 bg-background shadow-xl",
+          "z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border/60 bg-background shadow-xl",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",

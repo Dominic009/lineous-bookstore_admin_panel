@@ -1,14 +1,12 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
 import { useState, type ChangeEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -17,28 +15,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useCreateBook, useUpdateBook, usePublications, useSubjects } from "@/lib/hooks/use-books";
-import type { Book, CreateBookDto, UpdateBookDto, BookStatus } from "@/lib/types/book";
+import {
+  useCreateBook,
+  useUpdateBook,
+  usePublications,
+  useSubjects,
+} from "@/lib/hooks/use-books";
+import type {
+  Book,
+  UpdateBookDto,
+  BookStatus,
+} from "@/lib/types/book";
 
-// Form validation schema
-const bookSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
-  shortDescription: z.string().optional(),
-  description: z.string().optional(),
-  isbn: z.string().optional(),
-  price: z.number().min(0, "Price must be positive"),
-  discountPrice: z.number().min(0, "Discount price must be positive").optional(),
-  publicationDate: z.string().optional(),
-  edition: z.string().optional(),
-  language: z.string().optional(),
-  stock: z.number().int().min(0, "Stock must be non-negative").optional(),
-  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).optional(),
-  publicationId: z.string().optional(),
-  subjectId: z.string().optional(),
-});
-
-type BookFormValues = z.infer<typeof bookSchema>;
+type BookFormValues = {
+  title: string;
+  slug: string;
+  shortDescription?: string;
+  description?: string;
+  isbn?: string;
+  price: string;
+  discountPrice?: string;
+  publicationDate?: string;
+  edition?: string;
+  language?: string;
+  stock?: boolean;
+  stockAmount?: string;
+  status?: BookStatus;
+  publicationId?: string;
+  subjectId?: string;
+};
 
 interface BookFormProps {
   book?: Book | null;
@@ -57,26 +62,20 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   const createMutation = useCreateBook();
   const updateMutation = useUpdateBook();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<BookFormValues>({
-    resolver: zodResolver(bookSchema),
+  const { register, handleSubmit, setValue, watch } = useForm<BookFormValues>({
     defaultValues: {
       title: book?.title || "",
       slug: book?.slug || "",
       shortDescription: book?.shortDescription || "",
       description: book?.description || "",
       isbn: book?.isbn || "",
-      price: book?.price || 0,
-      discountPrice: book?.discountPrice || undefined,
+      price: book?.price ? String(book.price) : "",
+      discountPrice: book?.discountPrice ? String(book.discountPrice) : "",
       publicationDate: book?.publicationDate || "",
       edition: book?.edition || "",
       language: book?.language || "",
-      stock: book?.stock ?? 0,
+      stock: book?.stock ?? false,
+      stockAmount: book?.stockAmount ? String(book.stockAmount) : "",
       status: (book?.status as BookStatus) || "DRAFT",
       publicationId: book?.publicationId || "",
       subjectId: book?.subjectId || "",
@@ -96,63 +95,56 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   };
 
   const onSubmit = async (data: BookFormValues) => {
-    try {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("slug", data.slug);
-      if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
-      if (data.description) formData.append("description", data.description);
-      if (data.isbn) formData.append("isbn", data.isbn);
-      formData.append("price", data.price.toString());
-      if (data.discountPrice) formData.append("discountPrice", data.discountPrice.toString());
-      if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
-      if (data.edition) formData.append("edition", data.edition);
-      if (data.language) formData.append("language", data.language);
-      formData.append("stock", (data.stock ?? 0).toString());
-      formData.append("status", data.status || "DRAFT");
-      if (data.publicationId) formData.append("publicationId", data.publicationId);
-      if (data.subjectId) formData.append("subjectId", data.subjectId);
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("slug", data.slug);
+    if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
+    if (data.description) formData.append("description", data.description);
+    if (data.isbn) formData.append("isbn", data.isbn);
+    formData.append("price", data.price);
+    if (data.discountPrice) formData.append("discountPrice", data.discountPrice);
+    if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
+    if (data.edition) formData.append("edition", data.edition);
+    if (data.language) formData.append("language", data.language);
+    if (data.stock !== undefined) formData.append("stock", String(data.stock));
+    if (data.stockAmount) formData.append("stockAmount", data.stockAmount);
+    formData.append("status", data.status || "DRAFT");
+    if (data.publicationId) formData.append("publicationId", data.publicationId);
+    if (data.subjectId) formData.append("subjectId", data.subjectId);
 
-      if (thumbnailFile) {
-        formData.append("thumbnail", thumbnailFile);
-      }
-
-      attachmentFiles.forEach((file) => {
-        formData.append("attachments", file);
-      });
-
-      if (isEditing && book) {
-        // For editing, we use JSON (not FormData) as per API spec
-        const updateData: UpdateBookDto = {
-          title: data.title,
-          slug: data.slug,
-          shortDescription: data.shortDescription,
-          description: data.description,
-          isbn: data.isbn,
-          price: data.price,
-          discountPrice: data.discountPrice,
-          publicationDate: data.publicationDate,
-          edition: data.edition,
-          language: data.language,
-          stock: data.stock,
-          status: data.status,
-          publicationId: data.publicationId,
-          subjectId: data.subjectId,
-        };
-        await updateMutation.mutateAsync({ id: book.id, data: updateData });
-        toast.success("Book updated successfully");
-      } else {
-        await createMutation.mutateAsync(formData);
-        toast.success("Book created successfully");
-      }
-
-      onSuccess?.();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Failed to save book";
-      toast.error(errorMessage);
+    if (thumbnailFile) {
+      formData.append("thumbnail", thumbnailFile);
     }
+
+    attachmentFiles.forEach((file) => {
+      formData.append("attachments", file);
+    });
+
+    if (isEditing && book) {
+      // For editing, we use JSON (not FormData) as per API spec
+      const updateData: UpdateBookDto = {
+        title: data.title,
+        slug: data.slug,
+        shortDescription: data.shortDescription,
+        description: data.description,
+        isbn: data.isbn,
+        price: parseFloat(data.price) || 0,
+        discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : undefined,
+        publicationDate: data.publicationDate,
+        edition: data.edition,
+        language: data.language,
+        stock: data.stock,
+        stockAmount: data.stockAmount ? parseFloat(data.stockAmount) : undefined,
+        status: data.status,
+        publicationId: data.publicationId,
+        subjectId: data.subjectId,
+      };
+      await updateMutation.mutateAsync({ id: book.id, data: updateData });
+    } else {
+      await createMutation.mutateAsync(formData);
+    }
+
+    onSuccess?.();
   };
 
   return (
@@ -165,9 +157,6 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             {...register("title")}
             placeholder="Enter book title"
           />
-          {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -177,9 +166,6 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             {...register("slug")}
             placeholder="enter-book-slug"
           />
-          {errors.slug && (
-            <p className="text-sm text-destructive">{errors.slug.message}</p>
-          )}
         </div>
       </div>
 
@@ -206,11 +192,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="isbn">ISBN</Label>
-          <Input
-            id="isbn"
-            {...register("isbn")}
-            placeholder="978-..."
-          />
+          <Input id="isbn" {...register("isbn")} placeholder="978-..." />
         </div>
 
         <div className="space-y-2">
@@ -219,12 +201,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             id="price"
             type="number"
             step="0.01"
-            {...register("price", { valueAsNumber: true })}
+            {...register("price")}
             placeholder="0.00"
           />
-          {errors.price && (
-            <p className="text-sm text-destructive">{errors.price.message}</p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -233,7 +212,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             id="discountPrice"
             type="number"
             step="0.01"
-            {...register("discountPrice", { valueAsNumber: true })}
+            {...register("discountPrice")}
             placeholder="0.00"
           />
         </div>
@@ -270,11 +249,22 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="stock">Stock</Label>
+          <Label htmlFor="stock" className="flex items-center gap-2">
+            <Checkbox
+              id="stock"
+              checked={watch("stock") || false}
+              onCheckedChange={(checked) => setValue("stock", checked as boolean)}
+            />
+            In Stock
+          </Label>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="stockAmount">Stock Amount</Label>
           <Input
-            id="stock"
+            id="stockAmount"
             type="number"
-            {...register("stock", { valueAsNumber: true })}
+            {...register("stockAmount")}
             placeholder="0"
           />
         </div>
@@ -295,12 +285,16 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             </SelectContent>
           </Select>
         </div>
+      </div>
 
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="publicationId">Publication</Label>
           <Select
             value={watch("publicationId") || ""}
-            onValueChange={(value) => setValue("publicationId", value || undefined)}
+            onValueChange={(value) =>
+              setValue("publicationId", value || undefined)
+            }
           >
             <SelectTrigger id="publicationId">
               <SelectValue placeholder="Select publication" />
@@ -314,25 +308,25 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             </SelectContent>
           </Select>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="subjectId">Subject</Label>
-        <Select
-          value={watch("subjectId") || ""}
-          onValueChange={(value) => setValue("subjectId", value || undefined)}
-        >
-          <SelectTrigger id="subjectId">
-            <SelectValue placeholder="Select subject" />
-          </SelectTrigger>
-          <SelectContent>
-            {subjects.map((subject) => (
-              <SelectItem key={subject.id} value={subject.id}>
-                {subject.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <Label htmlFor="subjectId">Subject</Label>
+          <Select
+            value={watch("subjectId") || ""}
+            onValueChange={(value) => setValue("subjectId", value || undefined)}
+          >
+            <SelectTrigger id="subjectId">
+              <SelectValue placeholder="Select subject" />
+            </SelectTrigger>
+            <SelectContent>
+              {subjects.map((subject) => (
+                <SelectItem key={subject.id} value={subject.id}>
+                  {subject.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -372,8 +366,15 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Book" : "Create Book"}
+        <Button
+          type="submit"
+          disabled={createMutation.isPending || updateMutation.isPending}
+        >
+          {createMutation.isPending || updateMutation.isPending
+            ? "Saving..."
+            : isEditing
+            ? "Update Book"
+            : "Create Book"}
         </Button>
       </div>
     </form>

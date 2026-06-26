@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { booksApi } from "@/lib/api/books";
 import { QueryKeys } from "@/constants/query-key";
 import type { Book, CreateBookDto, UpdateBookDto } from "@/lib/types/book";
@@ -38,10 +39,15 @@ export function useCreateBook() {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await booksApi.createBook(formData);
-      return response.data;
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: QueryKeys.books });
+      toast.success(response.message || "Book created successfully");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
     },
   });
 }
@@ -53,11 +59,16 @@ export function useUpdateBook() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateBookDto }) => {
       const response = await booksApi.updateBook(id, data);
-      return response.data;
+      return response;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: QueryKeys.books });
       queryClient.invalidateQueries({ queryKey: [...QueryKeys.books, variables.id] });
+      toast.success(response.message || "Book updated successfully");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
     },
   });
 }
@@ -69,12 +80,35 @@ export function useDeleteBook() {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await booksApi.deleteBook(id);
-      return response.data;
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: QueryKeys.books });
+      toast.success(response.message || "Book deleted successfully");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
     },
   });
+}
+
+// Helper function to extract error message from backend response
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const axiosError = error as { response?: { data?: { message?: string | string[] } } };
+    const message = axiosError.response?.data?.message;
+    if (Array.isArray(message)) {
+      return message.join(", ");
+    }
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+  return "An unexpected error occurred";
 }
 
 // Hook to fetch publications
