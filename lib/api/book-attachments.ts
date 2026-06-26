@@ -1,11 +1,11 @@
 import apiClient from "./axios";
-import type { BookAttachment, ApiResponse } from "@/lib/types/book";
+import type { BookAttachment, ApiResponse, AttachmentType } from "@/lib/types/book";
 
-// Upload book attachment
+// Upload book attachment to Cloudinary
 export const uploadBookAttachment = async (
   file: File,
   bookId: string,
-  type: "IMAGE" | "PDF" | "BANNER" | "THUMBNAIL"
+  type: AttachmentType
 ): Promise<ApiResponse<{ url: string; publicId: string }>> => {
   const formData = new FormData();
   formData.append("file", file);
@@ -24,6 +24,21 @@ export const uploadBookAttachment = async (
   return response.data;
 };
 
+// Create book attachment record
+export const createBookAttachment = async (data: {
+  bookId: string;
+  url: string;
+  publicId: string;
+  type: AttachmentType;
+  sortOrder: number;
+}): Promise<ApiResponse<BookAttachment>> => {
+  const response = await apiClient.post<ApiResponse<BookAttachment>>(
+    "/book-attachments",
+    data
+  );
+  return response.data;
+};
+
 // Delete book attachment
 export const deleteBookAttachment = async (id: string): Promise<ApiResponse<null>> => {
   const response = await apiClient.delete<ApiResponse<null>>(`/upload/book-attachment/${id}`);
@@ -38,6 +53,7 @@ export const getBookAttachments = async (bookId: string): Promise<ApiResponse<Bo
 
 export const bookAttachmentsApi = {
   uploadBookAttachment,
+  createBookAttachment,
   deleteBookAttachment,
   getBookAttachments,
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { booksApi } from "@/lib/api/books";
 import { QueryKeys } from "@/constants/query-key";
@@ -39,6 +40,7 @@ export function useCreateBook() {
   return useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await booksApi.createBook(formData);
+      console.log(response);
       return response;
     },
     onSuccess: (response) => {
@@ -95,18 +97,19 @@ export function useDeleteBook() {
 
 // Helper function to extract error message from backend response
 function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "object" && error !== null && "response" in error) {
-    const axiosError = error as { response?: { data?: { message?: string | string[] } } };
-    const message = axiosError.response?.data?.message;
+  if (error instanceof AxiosError) {
+    const message = error.response?.data?.message;
+    console.log(message);
     if (Array.isArray(message)) {
       return message.join(", ");
     }
     if (typeof message === "string") {
       return message;
     }
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
   }
   return "An unexpected error occurred";
 }

@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { ProtectedRoute } from "@/components/auth/protected-route";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 
 export default function DashboardLayout({
   children,
@@ -21,7 +21,7 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
-      <Toaster />
+      <Toaster position="top-center" richColors />
     </ProtectedRoute>
   );
 }
