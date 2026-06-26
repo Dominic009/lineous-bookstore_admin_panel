@@ -70,7 +70,7 @@ export const navigation = [
 
   {
     title: "Reviews",
-    href: "/reviews",
+    href: "/admin/reviews",
     icon: Star,
   },
 

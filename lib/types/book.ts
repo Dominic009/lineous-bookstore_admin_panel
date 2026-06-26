@@ -129,6 +129,38 @@ export interface UpdateSubjectDto {
   description?: string;
 }
 
+// Review DTOs
+export interface CreateReviewDto {
+  bookId: string;
+  reviewerName: string;
+  designation?: string;
+  rating: number;
+  comment?: string;
+  displayOrder?: number;
+}
+
+export interface UpdateReviewDto {
+  reviewerName?: string;
+  designation?: string;
+  rating?: number;
+  comment?: string;
+  displayOrder?: number;
+}
+
+export interface Review {
+  id: string;
+  bookId: string;
+  reviewerName: string;
+  designation?: string;
+  rating: number;
+  comment?: string;
+  displayOrder: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   message: string;

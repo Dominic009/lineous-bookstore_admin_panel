@@ -1,0 +1,112 @@
+"use client";
+
+import { useReviews, useDeleteReview } from "@/lib/hooks/use-reviews";
+import type { Review } from "@/lib/types/book";
+import { ReviewActions } from "./review.actions";
+
+interface ReviewsTableProps {
+  bookId: string;
+  onEdit?: (review: Review) => void;
+  onDelete?: (review: Review) => void;
+}
+
+export function ReviewsTable({ bookId, onEdit, onDelete }: ReviewsTableProps) {
+  const { data: reviews, isLoading, error } = useReviews(bookId);
+  const deleteMutation = useDeleteReview();
+
+  const handleDelete = async (review: Review) => {
+    await deleteMutation.mutateAsync(review.id);
+    onDelete?.(review);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to load reviews";
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-destructive">{errorMessage}</p>
+      </div>
+    );
+  }
+
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-muted-foreground">No reviews found for this book</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Reviewer
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Designation
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Rating
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Comment
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Order
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {reviews.map((review) => (
+            <tr
+              key={review.id}
+              className="border-b border-border/40 transition-colors last:border-0 hover:bg-muted/20"
+            >
+              <td className="px-6 py-4">
+                <div>
+                  <h4 className="font-medium">{review.reviewerName}</h4>
+                </div>
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground">
+                {review.designation || "-"}
+              </td>
+
+              <td className="px-6 py-4 text-sm font-medium">
+                {review.rating}/5
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate">
+                {review.comment || "-"}
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground">
+                {review.displayOrder}
+              </td>
+
+              <td className="px-6 py-4">
+                <ReviewActions
+                  onEdit={() => onEdit?.(review)}
+                  onDelete={() => handleDelete(review)}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

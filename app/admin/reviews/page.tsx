@@ -1,0 +1,152 @@
+"use client";
+
+import { useState } from "react";
+import { Plus, Search } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { ReviewsTable } from "@/components/reviews/reviews-table";
+import { ReviewDialog } from "@/components/reviews/review-dialog";
+import { useBooks } from "@/lib/hooks/use-books";
+import type { Review } from "@/lib/types/book";
+
+export default function ReviewsPage() {
+  const [selectedBookId, setSelectedBookId] = useState<string>("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  const { data: books = [] } = useBooks();
+
+  const handleEdit = (review: Review) => {
+    setSelectedReview(review);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (review: Review) => {
+    setSelectedReview(review);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setIsDeleteDialogOpen(false);
+    setSelectedReview(null);
+  };
+
+  const selectedBook = books.find((b) => b.id === selectedBookId);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Reviews</h1>
+          <p className="mt-2 text-muted-foreground">
+            Manage book reviews and testimonials.
+          </p>
+        </div>
+
+        <ReviewDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          bookId={selectedBookId}
+          trigger={
+            <Button className="gap-2" disabled={!selectedBookId}>
+              <Plus className="h-4 w-4" />
+              Add Review
+            </Button>
+          }
+        />
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="w-full max-w-md">
+          <Select value={selectedBookId} onValueChange={setSelectedBookId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a book to manage reviews" />
+            </SelectTrigger>
+            <SelectContent>
+              {books.map((book) => (
+                <SelectItem key={book.id} value={book.id}>
+                  {book.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search reviews..."
+            className="h-10 rounded-md border-border/60 bg-muted/30 pl-10 pr-4"
+          />
+        </div>
+      </div>
+
+      {selectedBookId ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            Managing reviews for: <span className="font-medium">{selectedBook?.title || "Unknown Book"}</span>
+          </p>
+          <ReviewsTable
+            bookId={selectedBookId}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </>
+      ) : (
+        <div className="flex h-64 items-center justify-center">
+          <p className="text-muted-foreground">Please select a book to view its reviews</p>
+        </div>
+      )}
+
+      {/* Edit Dialog */}
+      <ReviewDialog
+        review={selectedReview}
+        bookId={selectedBookId}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Review</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the review by &#34;{selectedReview?.reviewerName}&#34;? This action will soft delete the review.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
