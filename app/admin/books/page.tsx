@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Search, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -21,10 +22,15 @@ import { BookDialog } from "@/components/books/book-dialog";
 import type { Book } from "@/lib/types/book";
 
 export default function BooksPage() {
+  const router = useRouter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
+  const handleView = (book: Book) => {
+    router.push(`/admin/books/${book.id}`);
+  };
 
   const handleEdit = (book: Book) => {
     setSelectedBook(book);
@@ -79,7 +85,7 @@ export default function BooksPage() {
         </Button>
       </div>
 
-      <BooksTable onEdit={handleEdit} onDelete={handleDelete} />
+      <BooksTable onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
 
       {/* Edit Dialog */}
       <BookDialog

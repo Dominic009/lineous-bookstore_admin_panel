@@ -8,11 +8,12 @@ import { useBooks, useDeleteBook } from "@/lib/hooks/use-books";
 import type { Book } from "@/lib/types/book";
 
 interface BooksTableProps {
+  onView?: (book: Book) => void;
   onEdit?: (book: Book) => void;
   onDelete?: (book: Book) => void;
 }
 
-export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
+export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
   const { data: books, isLoading, error } = useBooks();
   const deleteMutation = useDeleteBook();
 
@@ -125,6 +126,7 @@ export function BooksTable({ onEdit, onDelete }: BooksTableProps) {
 
               <td className="px-6 py-4">
                 <BookActions
+                  onView={() => onView?.(book)}
                   onEdit={() => onEdit?.(book)}
                   onDelete={() => handleDelete(book)}
                 />

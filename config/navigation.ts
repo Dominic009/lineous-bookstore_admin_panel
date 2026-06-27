@@ -50,23 +50,23 @@ export const navigation = [
     icon: Library,
   },
 
-  {
-    title: "Categories",
-    href: "/categories",
-    icon: FolderTree,
-  },
+  // {
+  //   title: "Categories",
+  //   href: "/categories",
+  //   icon: FolderTree,
+  // },
 
-  {
-    title: "Teachers",
-    href: "/teachers",
-    icon: GraduationCap,
-  },
+  // {
+  //   title: "Teachers",
+  //   href: "/teachers",
+  //   icon: GraduationCap,
+  // },
 
-  {
-    title: "Banners",
-    href: "/banners",
-    icon: Image,
-  },
+  // {
+  //   title: "Banners",
+  //   href: "/banners",
+  //   icon: Image,
+  // },
 
   {
     title: "Reviews",
@@ -74,15 +74,15 @@ export const navigation = [
     icon: Star,
   },
 
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
+  // {
+  //   title: "Settings",
+  //   href: "/settings",
+  //   icon: Settings,
+  // },
 
-  {
-    title: "Audit Logs",
-    href: "/audit-logs",
-    icon: ScrollText,
-  },
+  // {
+  //   title: "Audit Logs",
+  //   href: "/audit-logs",
+  //   icon: ScrollText,
+  // },
 ] as const;

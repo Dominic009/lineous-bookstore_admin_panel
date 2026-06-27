@@ -12,11 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface BookActionsProps {
+  onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
-export function BookActions({ onEdit, onDelete }: BookActionsProps) {
+export function BookActions({ onView, onEdit, onDelete }: BookActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,7 +27,7 @@ export function BookActions({ onEdit, onDelete }: BookActionsProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="rounded-md">
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onView}>
           <Eye className="mr-2 h-4 w-4" />
           View
         </DropdownMenuItem>
