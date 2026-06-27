@@ -161,6 +161,104 @@ export interface Review {
   deletedAt?: string;
 }
 
+// Order types
+export type OrderStatus = "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED";
+
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+
+export type PaymentMethod = "COD" | "CARD" | "BANK_TRANSFER" | "MOBILE_BANKING";
+
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  bookId: string;
+  bookTitle: string;
+  bookPrice: number;
+  quantity: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  userId: string;
+  addressId?: string;
+  orderNumber: string;
+  subtotal: number;
+  discount?: number;
+  shipping?: number;
+  total: number;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod?: PaymentMethod;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+  orderItems?: OrderItem[];
+}
+
+// Order DTOs
+export interface CreateOrderDto {
+  addressId: string;
+  discount?: number;
+  shipping?: number;
+  paymentMethod?: PaymentMethod;
+  notes?: string;
+}
+
+export interface UpdateOrderStatusDto {
+  status: OrderStatus;
+}
+
+// User types
+export type UserRole = "ADMIN" | "USER";
+
+export type UserProvider = "EMAIL" | "GOOGLE" | "FACEBOOK" | "APPLE";
+
+export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
+
+export interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  provider: UserProvider;
+  providerId?: string;
+  avatar?: string;
+  role: UserRole;
+  emailVerified: boolean;
+  status: UserStatus;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
+// User DTOs
+export interface CreateUserDto {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  password?: string;
+  role?: UserRole;
+  provider?: UserProvider;
+  providerId?: string;
+  avatar?: string;
+  status?: UserStatus;
+}
+
+export interface UpdateUserDto {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  password?: string;
+  avatar?: string;
+  role?: UserRole;
+  status?: UserStatus;
+}
+
 // API Response types
 export interface ApiResponse<T> {
   message: string;

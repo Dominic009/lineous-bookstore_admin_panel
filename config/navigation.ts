@@ -19,25 +19,11 @@ export const navigation = [
     href: "/admin/dashboard",
     icon: LayoutDashboard,
   },
-
   {
     title: "Books",
     href: "/admin/books",
     icon: BookOpen,
   },
-
-  {
-    title: "Users",
-    href: "/users",
-    icon: Users,
-  },
-
-  {
-    title: "Orders",
-    href: "/orders",
-    icon: ShoppingCart,
-  },
-
   {
     title: "Publications",
     href: "/admin/publications",
@@ -48,6 +34,18 @@ export const navigation = [
     title: "Subjects",
     href: "/admin/subjects",
     icon: Library,
+  },
+
+  {
+    title: "Users",
+    href: "/admin/users",
+    icon: Users,
+  },
+
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: ShoppingCart,
   },
 
   // {

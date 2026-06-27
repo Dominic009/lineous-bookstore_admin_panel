@@ -19,3 +19,15 @@ export const OrderStatus = [
     "CANCELLED",
     "RETURNED",
 ] as const;
+
+export const UserRole = [
+    "ADMIN",
+    "USER",
+] as const;
+
+export const UserProvider = [
+    "EMAIL",
+    "GOOGLE",
+    "FACEBOOK",
+    "APPLE",
+] as const;
