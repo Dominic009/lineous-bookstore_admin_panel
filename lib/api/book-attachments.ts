@@ -12,16 +12,19 @@ export const uploadBookAttachment = async (
   formData.append("bookId", bookId);
   formData.append("type", type);
 
-  const response = await apiClient.post<ApiResponse<{ url: string; publicId: string }>>(
-    "/upload/book-attachment",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-  return response.data;
+  const token = localStorage.getItem("accessToken");
+  const response = await fetch(`${apiClient.defaults.baseURL}/upload/book-attachment`, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to upload attachment");
+  }
+  return await response.json();
 };
 
 // Create book attachment record

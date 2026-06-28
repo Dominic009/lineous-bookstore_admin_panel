@@ -83,11 +83,12 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
                   <div className="flex h-14 w-10 items-center justify-center rounded-lg bg-muted/50">
                     {book.thumbnail ? (
                       <Image
-                        src={book.thumbnail}
+                        src={book?.thumbnail || ""}
                         alt={book.title}
                         width={40}
                         height={56}
                         className="rounded-md object-cover"
+                        unoptimized
                       />
                     ) : (
                       <div className="text-xs text-muted-foreground">

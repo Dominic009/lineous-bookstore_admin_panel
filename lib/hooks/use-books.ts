@@ -54,12 +54,12 @@ export function useCreateBook() {
   });
 }
 
-// Hook to update book
+// Hook to update book (supports both JSON and FormData for partial updates with file uploads)
 export function useUpdateBook() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateBookDto }) => {
+    mutationFn: async ({ id, data }: { id: string; data: UpdateBookDto | FormData }) => {
       const response = await booksApi.updateBook(id, data);
       return response;
     },

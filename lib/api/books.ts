@@ -15,12 +15,42 @@ export const getBook = async (id: string): Promise<ApiResponse<Book>> => {
 
 // Create book with FormData (for file uploads)
 export const createBook = async (formData: FormData): Promise<ApiResponse<Book>> => {
-  const response = await apiClient.post<ApiResponse<Book>>("/books", formData);
-  return response.data;
+  const token = localStorage.getItem("accessToken");
+  const response = await fetch(`${apiClient.defaults.baseURL}/books`, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to create book");
+  }
+  return await response.json();
 };
 
-// Update book
-export const updateBook = async (id: string, data: UpdateBookDto): Promise<ApiResponse<Book>> => {
+// Update book (supports both JSON and FormData for partial updates with file uploads)
+export const updateBook = async (id: string, data: UpdateBookDto | FormData): Promise<ApiResponse<Book>> => {
+  const isFormData = data instanceof FormData;
+  const token = localStorage.getItem("accessToken");
+
+  if (isFormData) {
+    // Use fetch for FormData to ensure proper multipart/form-data with boundary
+    const response = await fetch(`${apiClient.defaults.baseURL}/books/${id}`, {
+      method: "PATCH",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: data as FormData,
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to update book");
+    }
+    return await response.json();
+  }
+
   const response = await apiClient.patch<ApiResponse<Book>>(`/books/${id}`, data);
   return response.data;
 };

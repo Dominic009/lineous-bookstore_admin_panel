@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useState, type ChangeEvent } from "react";
+import { useState, useEffect, type ChangeEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,8 +53,41 @@ interface BookFormProps {
 
 export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
   const isEditing = !!book;
+
+  // Create preview URL for selected thumbnail
+  useEffect(() => {
+    if (thumbnailFile) {
+      const url = URL.createObjectURL(thumbnailFile);
+      setThumbnailPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setThumbnailPreview(null);
+  }, [thumbnailFile]);
+
+  // Store original values to detect changes
+  const originalValues = book
+    ? {
+        title: book.title,
+        slug: book.slug,
+        shortDescription: book.shortDescription || "",
+        description: book.description || "",
+        isbn: book.isbn || "",
+        price: String(book.price),
+        discountPrice: book.discountPrice ? String(book.discountPrice) : "",
+        publicationDate: book.publicationDate || "",
+        edition: book.edition || "",
+        language: book.language || "",
+        stock: book.stock ?? false,
+        stockAmount: book.stockAmount ? String(book.stockAmount) : "",
+        status: book.status as BookStatus,
+        publicationId: book.publicationId || "",
+        subjectId: book.subjectId || "",
+        thumbnail: book.thumbnail || "",
+      }
+    : null;
 
   const { data: publications = [] } = usePublications();
   const { data: subjects = [] } = useSubjects();
@@ -94,53 +127,100 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
     setAttachmentFiles((prev) => [...prev, ...files]);
   };
 
-  const onSubmit = async (data: BookFormValues) => {
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("slug", data.slug);
-    if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
-    if (data.description) formData.append("description", data.description);
-    if (data.isbn) formData.append("isbn", data.isbn);
-    formData.append("price", data.price);
-    if (data.discountPrice) formData.append("discountPrice", data.discountPrice);
-    if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
-    if (data.edition) formData.append("edition", data.edition);
-    if (data.language) formData.append("language", data.language);
-    if (data.stock !== undefined) formData.append("stock", String(data.stock));
-    if (data.stockAmount) formData.append("stockAmount", data.stockAmount);
-    formData.append("status", data.status || "DRAFT");
-    if (data.publicationId) formData.append("publicationId", data.publicationId);
-    if (data.subjectId) formData.append("subjectId", data.subjectId);
+  const buildPartialUpdate = (data: BookFormValues): { data: UpdateBookDto | FormData; hasFiles: boolean } => {
+    const hasFiles = !!thumbnailFile || attachmentFiles.length > 0;
+    const changes: Record<string, unknown> = {};
 
-    if (thumbnailFile) {
-      formData.append("thumbnail", thumbnailFile);
+    // Compare each field with original value and only include if changed
+    if (data.title !== originalValues?.title) changes.title = data.title;
+    if (data.slug !== originalValues?.slug) changes.slug = data.slug;
+    if (data.shortDescription !== originalValues?.shortDescription) changes.shortDescription = data.shortDescription;
+    if (data.description !== originalValues?.description) changes.description = data.description;
+    if (data.isbn !== originalValues?.isbn) changes.isbn = data.isbn;
+    if (data.price !== originalValues?.price) changes.price = parseFloat(data.price) || 0;
+    if (data.discountPrice !== originalValues?.discountPrice) {
+      changes.discountPrice = data.discountPrice ? parseFloat(data.discountPrice) : undefined;
+    }
+    if (data.publicationDate !== originalValues?.publicationDate) changes.publicationDate = data.publicationDate;
+    if (data.edition !== originalValues?.edition) changes.edition = data.edition;
+    if (data.language !== originalValues?.language) changes.language = data.language;
+    if (data.stock !== originalValues?.stock) changes.stock = data.stock;
+    if (data.stockAmount !== originalValues?.stockAmount) {
+      changes.stockAmount = data.stockAmount ? parseFloat(data.stockAmount) : undefined;
+    }
+    if (data.status !== originalValues?.status) changes.status = data.status;
+    if (data.publicationId !== originalValues?.publicationId) changes.publicationId = data.publicationId;
+    if (data.subjectId !== originalValues?.subjectId) changes.subjectId = data.subjectId;
+
+    if (hasFiles) {
+      // Use FormData when files are involved
+      const formData = new FormData();
+      Object.entries(changes).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, String(value));
+        }
+      });
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+      attachmentFiles.forEach((file) => {
+        formData.append("attachments", file);
+      });
+      return { data: formData, hasFiles: true };
     }
 
-    attachmentFiles.forEach((file) => {
-      formData.append("attachments", file);
-    });
+    return { data: changes as UpdateBookDto, hasFiles: false };
+  };
+
+  const onSubmit = async (data: BookFormValues) => {
+    console.log("=== Form Submit Debug ===");
+    console.log("thumbnailFile:", thumbnailFile);
+    console.log("thumbnailFile type:", thumbnailFile?.constructor.name);
+    console.log("thumbnailFile size:", thumbnailFile?.size);
+    console.log("attachmentFiles:", attachmentFiles);
+    console.log("isEditing:", isEditing);
+    console.log("========================");
 
     if (isEditing && book) {
-      // For editing, we use JSON (not FormData) as per API spec
-      const updateData: UpdateBookDto = {
-        title: data.title,
-        slug: data.slug,
-        shortDescription: data.shortDescription,
-        description: data.description,
-        isbn: data.isbn,
-        price: parseFloat(data.price) || 0,
-        discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : undefined,
-        publicationDate: data.publicationDate,
-        edition: data.edition,
-        language: data.language,
-        stock: data.stock,
-        stockAmount: data.stockAmount ? parseFloat(data.stockAmount) : undefined,
-        status: data.status,
-        publicationId: data.publicationId,
-        subjectId: data.subjectId,
-      };
+      const { data: updateData, hasFiles } = buildPartialUpdate(data);
+      console.log("Update hasFiles:", hasFiles);
+      console.log("Update data type:", hasFiles ? "FormData" : "JSON");
+      if (hasFiles) {
+        const fd = updateData as FormData;
+        console.log("FormData entries:");
+        for (const [key, value] of fd.entries()) {
+          console.log(`  ${key}:`, value);
+        }
+      } else {
+        console.log("Update JSON:", updateData);
+      }
       await updateMutation.mutateAsync({ id: book.id, data: updateData });
     } else {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("slug", data.slug);
+      if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
+      if (data.description) formData.append("description", data.description);
+      if (data.isbn) formData.append("isbn", data.isbn);
+      formData.append("price", data.price);
+      if (data.discountPrice) formData.append("discountPrice", data.discountPrice);
+      if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
+      if (data.edition) formData.append("edition", data.edition);
+      if (data.language) formData.append("language", data.language);
+      if (data.stock !== undefined) formData.append("stock", String(data.stock));
+      if (data.stockAmount) formData.append("stockAmount", data.stockAmount);
+      formData.append("status", data.status || "DRAFT");
+      if (data.publicationId) formData.append("publicationId", data.publicationId);
+      if (data.subjectId) formData.append("subjectId", data.subjectId);
+
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
+
+      attachmentFiles.forEach((file) => {
+        formData.append("attachments", file);
+      });
+
       await createMutation.mutateAsync(formData);
     }
 
@@ -337,10 +417,17 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
           accept="image/*"
           onChange={handleThumbnailChange}
         />
-        {book?.thumbnail && !thumbnailFile && (
-          <p className="text-sm text-muted-foreground">
-            Current: {book.thumbnail}
-          </p>
+        {(thumbnailPreview || (book?.thumbnail && !thumbnailFile)) && (
+          <div className="mt-2">
+            <p className="mb-1 text-sm text-muted-foreground">
+              {thumbnailFile ? "New Thumbnail Preview:" : "Current Thumbnail:"}
+            </p>
+            <img
+              src={thumbnailPreview || book?.thumbnail}
+              alt={thumbnailFile ? "Thumbnail preview" : "Current thumbnail"}
+              className="h-32 w-24 rounded-md object-cover"
+            />
+          </div>
         )}
       </div>
 
