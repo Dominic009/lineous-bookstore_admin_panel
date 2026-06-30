@@ -1,4 +1,4 @@
-# Admin Implementation Guide
+# Admin Implementation Guide   
 
 This document provides comprehensive API documentation for the Bookstore CMS Admin Panel. All endpoints use the global `/api` prefix.
 
