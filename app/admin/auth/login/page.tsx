@@ -36,20 +36,20 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen lg:grid-cols-2 relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+
+      {/* Animated gradient orbs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" />
+        <div className="absolute top-1/2 -left-40 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute -bottom-40 right-1/4 h-80 w-80 rounded-full bg-purple-500/20 blur-3xl" />
+      </div>
+
       {/* Left Panel - Branding with Gradient */}
-      <section className="relative hidden overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white lg:flex">
-        {/* Animated gradient orbs */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" />
-          <div className="absolute top-1/2 -left-40 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl" />
-          <div className="absolute -bottom-40 right-1/4 h-80 w-80 rounded-full bg-purple-500/20 blur-3xl" />
-        </div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-
-        <div className="relative z-10 flex h-full w-full flex-col justify-between p-14">
+      <section className="relative hidden overflow-hidden  text-white lg:flex">
+        <div className="relative z-10 flex h-full w-full flex-col gap-20 p-14">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
               <BookOpen className="h-6 w-6" />
@@ -66,52 +66,24 @@ export default function LoginPage() {
               Welcome Back
             </div>
 
-            <h1 className="text-5xl font-bold leading-tight">
-              Manage your bookstore with confidence.
-            </h1>
+            <h1 className="text-5xl font-bold leading-tight">Admin panel</h1>
 
             <p className="text-lg leading-8 text-slate-300">
               Track inventory, manage orders, organize books, publications,
               teachers and customers from one beautifully designed dashboard.
             </p>
-
-            <div className="flex gap-8 pt-4">
-              <div className="space-y-1">
-                <h3 className="text-3xl font-bold text-white">2.5K+</h3>
-                <p className="text-sm text-slate-400">Books</p>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="text-3xl font-bold text-white">430+</h3>
-                <p className="text-sm text-slate-400">Orders</p>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="text-3xl font-bold text-white">1.2K+</h3>
-                <p className="text-sm text-slate-400">Users</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 text-sm text-slate-400">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Secure Access
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              24/7 Support
-            </div>
           </div>
         </div>
       </section>
 
       {/* Right Panel - Login Form with Gradient */}
-      <section className="flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-8 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <section className="flex items-center justify-center z-9999">
         <Card className="w-full max-w-md rounded-3xl border-0 shadow-2xl">
           <CardContent className="p-10">
             <div className="mb-10 space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight">Welcome Back</h2>
+              <h2 className="text-3xl font-bold tracking-tight">
+                Welcome Back
+              </h2>
               <p className="text-muted-foreground">
                 Sign in to continue managing your bookstore.
               </p>
