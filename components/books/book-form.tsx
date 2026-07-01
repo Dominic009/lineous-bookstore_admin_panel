@@ -431,7 +431,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
         )}
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <Label htmlFor="attachments">Additional Attachments</Label>
         <Input
           id="attachments"
@@ -445,7 +445,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             {attachmentFiles.length} file(s) selected
           </p>
         )}
-      </div>
+      </div> */}
 
       <div className="flex justify-end gap-2">
         {onCancel && (
