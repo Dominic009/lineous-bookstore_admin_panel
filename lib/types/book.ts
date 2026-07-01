@@ -11,6 +11,7 @@ export interface Publication {
   description?: string;
   logo?: string;
   status: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -21,6 +22,8 @@ export interface Subject {
   name: string;
   slug: string;
   description?: string;
+  publicationId?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -53,8 +56,8 @@ export interface Book {
   stockAmount?: number;
   status: BookStatus;
   thumbnail?: string;
-  publicationId?: string;
-  subjectId?: string;
+  publicationId: string;
+  subjectId: string;
   createdAt: string;
   updatedAt: string;
   publication?: Publication;
@@ -77,8 +80,8 @@ export interface CreateBookDto {
   stock?: boolean;
   stockAmount?: number;
   status?: BookStatus;
-  publicationId?: string;
-  subjectId?: string;
+  publicationId: string;
+  subjectId: string;
 }
 
 export interface UpdateBookDto {
@@ -106,6 +109,7 @@ export interface CreatePublicationDto {
   description?: string;
   logo?: string;
   status?: BookStatus;
+  isActive?: boolean;
 }
 
 export interface UpdatePublicationDto {
@@ -114,6 +118,7 @@ export interface UpdatePublicationDto {
   description?: string;
   logo?: string;
   status?: BookStatus;
+  isActive?: boolean;
 }
 
 // Subject DTOs
@@ -121,12 +126,16 @@ export interface CreateSubjectDto {
   name: string;
   slug: string;
   description?: string;
+  publicationId?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateSubjectDto {
   name?: string;
   slug?: string;
   description?: string;
+  publicationId?: string;
+  isActive?: boolean;
 }
 
 // Review DTOs
@@ -273,4 +282,33 @@ export interface PaginatedResponse<T> {
   total?: number;
   page?: number;
   limit?: number;
+}
+
+// Tree structure types
+export interface BookTreeBook {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  thumbnail?: string;
+}
+
+export interface BookTreeSubject {
+  subject: {
+    id: string;
+    name: string;
+    slug: string;
+    isActive: boolean;
+  };
+  books: BookTreeBook[];
+}
+
+export interface BookTreePublication {
+  publication: {
+    id: string;
+    name: string;
+    slug: string;
+    isActive: boolean;
+  };
+  subjects: BookTreeSubject[];
 }

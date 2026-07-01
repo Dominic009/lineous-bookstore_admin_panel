@@ -5,17 +5,28 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import {
   useCreateSubject,
   useUpdateSubject,
 } from "@/lib/hooks/use-subjects";
+import { usePublications } from "@/lib/hooks/use-publications";
 import type { Subject, UpdateSubjectDto } from "@/lib/types/book";
 
 type SubjectFormValues = {
   name: string;
   slug: string;
   description?: string;
+  publicationId?: string;
+  isActive?: boolean;
 };
 
 interface SubjectFormProps {
@@ -29,12 +40,15 @@ export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) 
 
   const createMutation = useCreateSubject();
   const updateMutation = useUpdateSubject();
+  const { data: publications = [] } = usePublications();
 
-  const { register, handleSubmit } = useForm<SubjectFormValues>({
+  const { register, handleSubmit, setValue, watch } = useForm<SubjectFormValues>({
     defaultValues: {
       name: subject?.name || "",
       slug: subject?.slug || "",
       description: subject?.description || "",
+      publicationId: subject?.publicationId || "",
+      isActive: subject?.isActive ?? true,
     },
   });
 
@@ -44,6 +58,8 @@ export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) 
         name: data.name,
         slug: data.slug,
         description: data.description,
+        publicationId: data.publicationId,
+        isActive: data.isActive,
       };
       await updateMutation.mutateAsync({ id: subject.id, data: updateData });
     } else {
@@ -82,6 +98,46 @@ export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) 
           {...register("description")}
           placeholder="Subject description"
           rows={3}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="publicationId">Publication</Label>
+        <Select
+          value={watch("publicationId") || ""}
+          onValueChange={(value) => setValue("publicationId", value || undefined)}
+        >
+          <SelectTrigger id="publicationId">
+            <SelectValue placeholder="Select publication (optional)" />
+          </SelectTrigger>
+          <SelectContent>
+            {publications.map((pub) => (
+              <SelectItem key={pub.id} value={pub.id}>
+                {pub.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Optionally link this subject to a publication
+        </p>
+      </div>
+
+      <div className="flex items-center justify-between rounded-lg border border-border/60 p-4">
+        <div className="space-y-0.5">
+          <Label htmlFor="isActive" className="text-base">
+            Active Status
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            {watch("isActive") !== false
+              ? "Subject is visible and active"
+              : "Subject is hidden and inactive"}
+          </p>
+        </div>
+        <Switch
+          id="isActive"
+          checked={watch("isActive") ?? true}
+          onCheckedChange={(checked) => setValue("isActive", checked)}
         />
       </div>
 

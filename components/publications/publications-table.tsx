@@ -1,9 +1,10 @@
 "use client";
 
-import { usePublications, useDeletePublication } from "@/lib/hooks/use-publications";
+import { usePublications, useDeletePublication, useUpdatePublication } from "@/lib/hooks/use-publications";
 import type { Publication } from "@/lib/types/book";
 import { PublicationActions } from "./publication.actions";
 import { StatusBadge } from "@/components/books/status-badge";
+import { toast } from "sonner";
 
 interface PublicationsTableProps {
   onEdit?: (publication: Publication) => void;
@@ -13,10 +14,25 @@ interface PublicationsTableProps {
 export function PublicationsTable({ onEdit, onDelete }: PublicationsTableProps) {
   const { data: publications, isLoading, error } = usePublications();
   const deleteMutation = useDeletePublication();
+  const updateMutation = useUpdatePublication();
 
   const handleDelete = async (publication: Publication) => {
     await deleteMutation.mutateAsync(publication.id);
     onDelete?.(publication);
+  };
+
+  const handleToggleActive = async (publication: Publication) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: publication.id,
+        data: { isActive: !publication.isActive },
+      });
+      toast.success(
+        `Publication ${publication.isActive ? "deactivated" : "activated"} successfully`
+      );
+    } catch {
+      // Error handled by mutation
+    }
   };
 
   if (isLoading) {
@@ -58,6 +74,9 @@ export function PublicationsTable({ onEdit, onDelete }: PublicationsTableProps) 
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
               Status
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Active
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
               Created At
@@ -103,6 +122,20 @@ export function PublicationsTable({ onEdit, onDelete }: PublicationsTableProps) 
 
               <td className="px-6 py-4">
                 <StatusBadge status={publication.status as "PUBLISHED" | "DRAFT" | "ARCHIVED"} />
+              </td>
+
+              <td className="px-6 py-4">
+                <button
+                  onClick={() => handleToggleActive(publication)}
+                  disabled={updateMutation.isPending}
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                    publication.isActive
+                      ? "bg-green-100 text-green-800 hover:bg-green-200"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  } disabled:opacity-50`}
+                >
+                  {publication.isActive ? "Active" : "Inactive"}
+                </button>
               </td>
 
               <td className="px-6 py-4 text-sm text-muted-foreground">

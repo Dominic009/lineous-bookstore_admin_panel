@@ -1,8 +1,9 @@
 "use client";
 
-import { useSubjects, useDeleteSubject } from "@/lib/hooks/use-subjects";
+import { useSubjects, useDeleteSubject, useUpdateSubject } from "@/lib/hooks/use-subjects";
 import type { Subject } from "@/lib/types/book";
 import { SubjectActions } from "./subject.actions";
+import { toast } from "sonner";
 
 interface SubjectsTableProps {
   onEdit?: (subject: Subject) => void;
@@ -12,10 +13,25 @@ interface SubjectsTableProps {
 export function SubjectsTable({ onEdit, onDelete }: SubjectsTableProps) {
   const { data: subjects, isLoading, error } = useSubjects();
   const deleteMutation = useDeleteSubject();
+  const updateMutation = useUpdateSubject();
 
   const handleDelete = async (subject: Subject) => {
     await deleteMutation.mutateAsync(subject.id);
     onDelete?.(subject);
+  };
+
+  const handleToggleActive = async (subject: Subject) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: subject.id,
+        data: { isActive: !subject.isActive },
+      });
+      toast.success(
+        `Subject ${subject.isActive ? "deactivated" : "activated"} successfully`
+      );
+    } catch {
+      // Error handled by mutation
+    }
   };
 
   if (isLoading) {
@@ -56,7 +72,13 @@ export function SubjectsTable({ onEdit, onDelete }: SubjectsTableProps) {
               Slug
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
+              Publication
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
               Description
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Active
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
               Created At
@@ -82,7 +104,25 @@ export function SubjectsTable({ onEdit, onDelete }: SubjectsTableProps) {
               </td>
 
               <td className="px-6 py-4 text-sm text-muted-foreground">
+                {subject.publicationId || "-"}
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground">
                 {subject.description || "-"}
+              </td>
+
+              <td className="px-6 py-4">
+                <button
+                  onClick={() => handleToggleActive(subject)}
+                  disabled={updateMutation.isPending}
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                    subject.isActive
+                      ? "bg-green-100 text-green-800 hover:bg-green-200"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  } disabled:opacity-50`}
+                >
+                  {subject.isActive ? "Active" : "Inactive"}
+                </button>
               </td>
 
               <td className="px-6 py-4 text-sm text-muted-foreground">

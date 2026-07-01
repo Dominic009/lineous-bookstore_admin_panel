@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -30,6 +31,7 @@ type PublicationFormValues = {
   description?: string;
   logo?: string;
   status?: BookStatus;
+  isActive?: boolean;
 };
 
 interface PublicationFormProps {
@@ -51,6 +53,7 @@ export function PublicationForm({ publication, onSuccess, onCancel }: Publicatio
       description: publication?.description || "",
       logo: publication?.logo || "",
       status: (publication?.status as BookStatus) || "PUBLISHED",
+      isActive: publication?.isActive ?? true,
     },
   });
 
@@ -62,6 +65,7 @@ export function PublicationForm({ publication, onSuccess, onCancel }: Publicatio
         description: data.description,
         logo: data.logo,
         status: data.status,
+        isActive: data.isActive,
       };
       await updateMutation.mutateAsync({ id: publication.id, data: updateData });
     } else {
@@ -71,6 +75,7 @@ export function PublicationForm({ publication, onSuccess, onCancel }: Publicatio
         description: data.description,
         logo: data.logo,
         status: data.status || "PUBLISHED",
+        isActive: data.isActive ?? true,
       };
       await createMutation.mutateAsync(createData);
     }
@@ -139,6 +144,24 @@ export function PublicationForm({ publication, onSuccess, onCancel }: Publicatio
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex items-center justify-between rounded-lg border border-border/60 p-4">
+        <div className="space-y-0.5">
+          <Label htmlFor="isActive" className="text-base">
+            Active Status
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            {watch("isActive") !== false
+              ? "Publication is visible and active"
+              : "Publication is hidden and inactive"}
+          </p>
+        </div>
+        <Switch
+          id="isActive"
+          checked={watch("isActive") ?? true}
+          onCheckedChange={(checked) => setValue("isActive", checked)}
+        />
       </div>
 
       <div className="flex justify-end gap-2">

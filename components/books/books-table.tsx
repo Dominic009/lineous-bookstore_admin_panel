@@ -57,6 +57,12 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
               Book
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
+              Publication
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Subject
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
               ISBN
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
@@ -100,10 +106,18 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
                   <div>
                     <h4 className="font-medium">{book.title}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {book.subject?.name || "Uncategorized"}
+                      {book.slug}
                     </p>
                   </div>
                 </div>
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground">
+                {book.publication?.name || book.publicationId || "-"}
+              </td>
+
+              <td className="px-6 py-4 text-sm text-muted-foreground">
+                {book.subject?.name || book.subjectId || "-"}
               </td>
 
               <td className="px-6 py-4 text-sm text-muted-foreground">
@@ -119,7 +133,7 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
                 )}
               </td>
 
-              <td className="px-6 py-4 text-sm">{book.stock}</td>
+              <td className="px-6 py-4 text-sm">{book.stock ? "Yes" : "No"}</td>
 
               <td className="px-6 py-4">
                 <StatusBadge status={book.status} />

@@ -3,13 +3,9 @@ import {
   LayoutDashboard,
   Users,
   ShoppingCart,
-  GraduationCap,
   Library,
   FolderTree,
-  Image,
   Star,
-  Settings,
-  ScrollText,
   Building2,
 } from "lucide-react";
 
@@ -23,6 +19,11 @@ export const navigation = [
     title: "Books",
     href: "/admin/books",
     icon: BookOpen,
+  },
+  {
+    title: "Books Tree",
+    href: "/admin/books/tree",
+    icon: FolderTree,
   },
   {
     title: "Publications",

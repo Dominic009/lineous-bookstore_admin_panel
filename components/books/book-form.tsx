@@ -41,8 +41,8 @@ type BookFormValues = {
   stock?: boolean;
   stockAmount?: string;
   status?: BookStatus;
-  publicationId?: string;
-  subjectId?: string;
+  publicationId: string;
+  subjectId: string;
 };
 
 interface BookFormProps {
@@ -114,6 +114,13 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       subjectId: book?.subjectId || "",
     },
   });
+
+  const selectedPublicationId = watch("publicationId");
+
+  // Filter subjects by selected publication
+  const filteredSubjects = selectedPublicationId
+    ? subjects.filter((subject) => subject.publicationId === selectedPublicationId)
+    : subjects;
 
   const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -210,8 +217,8 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       if (data.stock !== undefined) formData.append("stock", String(data.stock));
       if (data.stockAmount) formData.append("stockAmount", data.stockAmount);
       formData.append("status", data.status || "DRAFT");
-      if (data.publicationId) formData.append("publicationId", data.publicationId);
-      if (data.subjectId) formData.append("subjectId", data.subjectId);
+      formData.append("publicationId", data.publicationId);
+      formData.append("subjectId", data.subjectId);
 
       if (thumbnailFile) {
         formData.append("thumbnail", thumbnailFile);
@@ -369,12 +376,14 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="publicationId">Publication</Label>
+          <Label htmlFor="publicationId">Publication *</Label>
           <Select
             value={watch("publicationId") || ""}
-            onValueChange={(value) =>
-              setValue("publicationId", value || undefined)
-            }
+            onValueChange={(value) => {
+              setValue("publicationId", value);
+              // Reset subject when publication changes
+              setValue("subjectId", "");
+            }}
           >
             <SelectTrigger id="publicationId">
               <SelectValue placeholder="Select publication" />
@@ -390,22 +399,28 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subjectId">Subject</Label>
+          <Label htmlFor="subjectId">Subject *</Label>
           <Select
             value={watch("subjectId") || ""}
-            onValueChange={(value) => setValue("subjectId", value || undefined)}
+            onValueChange={(value) => setValue("subjectId", value)}
+            disabled={!selectedPublicationId}
           >
             <SelectTrigger id="subjectId">
-              <SelectValue placeholder="Select subject" />
+              <SelectValue placeholder={selectedPublicationId ? "Select subject" : "Select publication first"} />
             </SelectTrigger>
             <SelectContent>
-              {subjects.map((subject) => (
+              {filteredSubjects.map((subject) => (
                 <SelectItem key={subject.id} value={subject.id}>
                   {subject.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {!selectedPublicationId && (
+            <p className="text-xs text-muted-foreground">
+              Please select a publication first
+            </p>
+          )}
         </div>
       </div>
 

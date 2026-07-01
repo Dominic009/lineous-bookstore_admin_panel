@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { booksApi } from "@/lib/api/books";
 import { QueryKeys } from "@/constants/query-key";
-import type { Book, CreateBookDto, UpdateBookDto } from "@/lib/types/book";
+import type { UpdateBookDto, BookTreePublication } from "@/lib/types/book";
 
 // Hook to fetch all books
 export function useBooks() {
@@ -30,6 +30,19 @@ export function useBook(id: string) {
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook to fetch books tree structure
+export function useBooksTree() {
+  return useQuery({
+    queryKey: QueryKeys.booksTree,
+    queryFn: async () => {
+      const response = await booksApi.getBooksTree();
+      return response;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   });
 }
 

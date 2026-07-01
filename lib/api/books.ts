@@ -1,5 +1,5 @@
 import apiClient from "./axios";
-import type { Book, CreateBookDto, UpdateBookDto, ApiResponse, Publication, Subject } from "@/lib/types/book";
+import type { Book, UpdateBookDto, ApiResponse, Publication, Subject, BookTreePublication } from "@/lib/types/book";
 
 // Get all books
 export const getBooks = async (): Promise<ApiResponse<Book[]>> => {
@@ -10,6 +10,12 @@ export const getBooks = async (): Promise<ApiResponse<Book[]>> => {
 // Get book by ID
 export const getBook = async (id: string): Promise<ApiResponse<Book>> => {
   const response = await apiClient.get<ApiResponse<Book>>(`/books/${id}`);
+  return response.data;
+};
+
+// Get books in tree structure: publications > subjects > books
+export const getBooksTree = async (): Promise<BookTreePublication[]> => {
+  const response = await apiClient.get<BookTreePublication[]>("/books/tree");
   return response.data;
 };
 
@@ -76,6 +82,7 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]>> => {
 export const booksApi = {
   getBooks,
   getBook,
+  getBooksTree,
   createBook,
   updateBook,
   deleteBook,

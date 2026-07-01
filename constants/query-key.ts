@@ -1,6 +1,8 @@
 export const QueryKeys = {
     books: ["books"],
 
+    booksTree: ["books", "tree"],
+
     users: ["users"],
 
     orders: ["orders"],
