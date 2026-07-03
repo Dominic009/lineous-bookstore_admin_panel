@@ -1,5 +1,15 @@
 import apiClient from "./axios";
-import type { Book, UpdateBookDto, ApiResponse, Publication, Subject, BookTreePublication } from "@/lib/types/book";
+import type {
+  Book,
+  UpdateBookDto,
+  ApiResponse,
+  Publication,
+  Subject,
+  BookTreePublication,
+  BookPaper,
+  CreateBookPaperDto,
+  UpdateBookPaperDto,
+} from "@/lib/types/book";
 
 // Get all books
 export const getBooks = async (): Promise<ApiResponse<Book[]>> => {
@@ -79,6 +89,38 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]>> => {
   return response.data;
 };
 
+// ==================== BookPaper API ====================
+
+// Get papers for a book
+export const getBookPapers = async (bookId: string): Promise<ApiResponse<BookPaper[]>> => {
+  const response = await apiClient.get<ApiResponse<BookPaper[]>>(`/book-papers/book/${bookId}`);
+  return response.data;
+};
+
+// Get single paper
+export const getBookPaper = async (id: string): Promise<ApiResponse<BookPaper>> => {
+  const response = await apiClient.get<ApiResponse<BookPaper>>(`/book-papers/${id}`);
+  return response.data;
+};
+
+// Create paper
+export const createBookPaper = async (data: CreateBookPaperDto): Promise<ApiResponse<BookPaper>> => {
+  const response = await apiClient.post<ApiResponse<BookPaper>>("/book-papers", data);
+  return response.data;
+};
+
+// Update paper
+export const updateBookPaper = async (id: string, data: UpdateBookPaperDto): Promise<ApiResponse<BookPaper>> => {
+  const response = await apiClient.patch<ApiResponse<BookPaper>>(`/book-papers/${id}`, data);
+  return response.data;
+};
+
+// Delete paper (soft delete)
+export const deleteBookPaper = async (id: string): Promise<ApiResponse<null>> => {
+  const response = await apiClient.delete<ApiResponse<null>>(`/book-papers/${id}`);
+  return response.data;
+};
+
 export const booksApi = {
   getBooks,
   getBook,
@@ -88,6 +130,11 @@ export const booksApi = {
   deleteBook,
   getPublications,
   getSubjects,
+  getBookPapers,
+  getBookPaper,
+  createBookPaper,
+  updateBookPaper,
+  deleteBookPaper,
 };
 
 export default booksApi;

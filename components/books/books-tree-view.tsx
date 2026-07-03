@@ -116,7 +116,7 @@ export function BooksTreeView({ data }: TreeViewProps) {
                           <Book className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">{book.title}</span>
                           <span className="text-xs text-muted-foreground">
-                            ${book.price}
+                            {book.priceRange?.display || "-"}
                           </span>
                         </div>
                       ))}

@@ -5,7 +5,13 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { booksApi } from "@/lib/api/books";
 import { QueryKeys } from "@/constants/query-key";
-import type { UpdateBookDto, BookTreePublication } from "@/lib/types/book";
+import type {
+  UpdateBookDto,
+  BookTreePublication,
+  BookPaper,
+  CreateBookPaperDto,
+  UpdateBookPaperDto,
+} from "@/lib/types/book";
 
 // Hook to fetch all books
 export function useBooks() {
@@ -104,6 +110,81 @@ export function useDeleteBook() {
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
+    },
+  });
+}
+
+// ==================== BookPaper Hooks ====================
+
+// Hook to fetch papers for a book
+export function useBookPapers(bookId: string) {
+  return useQuery({
+    queryKey: QueryKeys.bookPapersByBook(bookId),
+    queryFn: async () => {
+      const response = await booksApi.getBookPapers(bookId);
+      return response.data;
+    },
+    enabled: !!bookId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook to create paper
+export function useCreateBookPaper() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateBookPaperDto) => {
+      const response = await booksApi.createBookPaper(data);
+      return response;
+    },
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapersByBook(variables.bookId) });
+      queryClient.invalidateQueries({ queryKey: QueryKeys.books });
+      toast.success(response.message || "Paper created successfully");
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+}
+
+// Hook to update paper
+export function useUpdateBookPaper() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateBookPaperDto }) => {
+      const response = await booksApi.updateBookPaper(id, data);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.books });
+      queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapers });
+      toast.success(response.message || "Paper updated successfully");
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+}
+
+// Hook to delete paper
+export function useDeleteBookPaper() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await booksApi.deleteBookPaper(id);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.books });
+      queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapers });
+      toast.success(response.message || "Paper deleted successfully");
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error));
     },
   });
 }

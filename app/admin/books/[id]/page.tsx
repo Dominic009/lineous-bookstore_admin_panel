@@ -1,7 +1,19 @@
 "use client";
 
 import { use } from "react";
-import { ArrowLeft, Star, BookOpen, Tag, Hash, DollarSign, Package, Calendar, FileText, ShoppingCart } from "lucide-react";
+import {
+  ArrowLeft,
+  Star,
+  BookOpen,
+  Tag,
+  Hash,
+  DollarSign,
+  Package,
+  Calendar,
+  FileText,
+  ShoppingCart,
+  Plus,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +25,7 @@ import { useReviews } from "@/lib/hooks/use-reviews";
 import { useRouter } from "next/navigation";
 import type { Book, Review } from "@/lib/types/book";
 import { StatusBadge } from "@/components/books/status-badge";
+import { BookPapersManager } from "@/components/books/book-papers-manager";
 
 interface BookDetailPageProps {
   params: Promise<{ id: string }>;
@@ -63,18 +76,26 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
   }
 
   const averageRating = reviews?.length
-    ? reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / reviews.length
+    ? reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) /
+      reviews.length
     : 0;
 
   return (
     <div className="min-h-screen">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/admin/books")} className="h-auto p-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/admin/books")}
+          className="h-auto p-0"
+        >
           Books
         </Button>
         <span>/</span>
-        <span className="truncate font-medium text-foreground">{book.title}</span>
+        <span className="truncate font-medium text-foreground">
+          {book.title}
+        </span>
       </div>
 
       {/* Product Section */}
@@ -99,31 +120,32 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
           <div>
             <div className="mb-2 flex items-center gap-3">
               <StatusBadge status={book.status} />
-              {book.stock ? (
-                <Badge variant="outline" className="border-emerald-200 text-emerald-700">
-                  In Stock
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="border-red-200 text-red-700">
-                  Out of Stock
+              {book.papers && book.papers.length > 0 && (
+                <Badge
+                  variant="outline"
+                  className="border-emerald-200 text-emerald-700"
+                >
+                  {book.papers.length} Paper
+                  {book.papers.length !== 1 ? "s" : ""}
                 </Badge>
               )}
             </div>
             <h1 className="text-3xl font-bold tracking-tight">{book.title}</h1>
             {book.shortDescription && (
-              <p className="mt-2 text-lg text-muted-foreground">{book.shortDescription}</p>
+              <p className="mt-2 text-lg text-muted-foreground">
+                {book.shortDescription}
+              </p>
             )}
           </div>
 
           <Separator />
 
-          {/* Price & Rating */}
+          {/* Price Range */}
           <div className="space-y-3">
             <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold">${book.price}</span>
-              {book.discountPrice && (
-                <span className="text-xl text-muted-foreground line-through">${book.discountPrice}</span>
-              )}
+              <span className="text-4xl font-bold">
+                {book.priceRange?.display || "No papers"}
+              </span>
             </div>
 
             {reviews && reviews.length > 0 && (
@@ -140,14 +162,6 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
 
           {/* Meta Info */}
           <div className="grid grid-cols-2 gap-4">
-            {book.isbn && (
-              <div className="flex items-center gap-2 text-sm">
-                <Hash className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">ISBN:</span>
-                <span className="font-medium">{book.isbn}</span>
-              </div>
-            )}
-
             {book.publication && (
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -184,7 +198,9 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Published:</span>
-                <span className="font-medium">{new Date(book.publicationDate).toLocaleDateString()}</span>
+                <span className="font-medium">
+                  {new Date(book.publicationDate).toLocaleDateString()}
+                </span>
               </div>
             )}
           </div>
@@ -193,11 +209,11 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button className="gap-2" disabled={!book.stock}>
-              <ShoppingCart className="h-4 w-4" />
-              Add to Cart
-            </Button>
-            <Button variant="outline" onClick={() => router.push(`/admin/books/${book.id}/edit`)}>
+            <Button
+              className="gap-2"
+              variant="outline"
+              onClick={() => router.push(`/admin/books/${book.id}/edit`)}
+            >
               Edit Book
             </Button>
           </div>
@@ -210,11 +226,18 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
           <Card>
             <CardContent className="p-6">
               <h2 className="mb-4 text-xl font-semibold">Description</h2>
-              <p className="whitespace-pre-line text-muted-foreground">{book.description}</p>
+              <p className="whitespace-pre-line text-muted-foreground">
+                {book.description}
+              </p>
             </CardContent>
           </Card>
         </div>
       )}
+
+      {/* Papers Management Section */}
+      <div className="mt-12">
+        <BookPapersManager bookId={book.id} bookTitle={book.title} />
+      </div>
 
       {/* Reviews Section */}
       <div className="mt-12">
@@ -240,22 +263,30 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h4 className="font-semibold">{review.reviewerName}</h4>
+                          <h4 className="font-semibold">
+                            {review.reviewerName}
+                          </h4>
                           {review.designation && (
-                            <p className="text-sm text-muted-foreground">{review.designation}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {review.designation}
+                            </p>
                           )}
                         </div>
                         <StarRating rating={review.rating} />
                       </div>
                       {review.comment && (
-                        <p className="mt-3 text-sm text-muted-foreground">{review.comment}</p>
+                        <p className="mt-3 text-sm text-muted-foreground">
+                          {review.comment}
+                        </p>
                       )}
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-muted-foreground">No reviews yet. Be the first to review this book!</p>
+              <p className="py-8 text-center text-muted-foreground">
+                No reviews yet. Be the first to review this book!
+              </p>
             )}
           </CardContent>
         </Card>

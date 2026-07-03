@@ -40,20 +40,43 @@ export interface BookAttachment {
   updatedAt: string;
 }
 
+export interface PriceRange {
+  min: number;
+  max: number;
+  display: string;
+}
+
+export interface BookPaper {
+  id: string;
+  bookId: string;
+  code?: string;
+  name: string;
+  price: number;
+  discountPrice?: number;
+  discountStartDate?: string;
+  discountEndDate?: string;
+  stock: number;
+  isbn?: string;
+  pageCount?: number;
+  thumbnail?: string;
+  sortOrder: number;
+  isDefault: boolean;
+  status: "DRAFT" | "PUBLISHED";
+  effectivePrice: number;
+  isInStock: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Book {
   id: string;
   title: string;
   slug: string;
   shortDescription?: string;
   description?: string;
-  isbn?: string;
-  price: number;
-  discountPrice?: number;
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: boolean;
-  stockAmount?: number;
   status: BookStatus;
   thumbnail?: string;
   publicationId: string;
@@ -63,6 +86,8 @@ export interface Book {
   publication?: Publication;
   subject?: Subject;
   attachments?: BookAttachment[];
+  papers?: BookPaper[];
+  priceRange?: PriceRange | null;
 }
 
 // DTOs for API requests
@@ -71,14 +96,9 @@ export interface CreateBookDto {
   slug: string;
   shortDescription?: string;
   description?: string;
-  isbn?: string;
-  price: number;
-  discountPrice?: number;
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: boolean;
-  stockAmount?: number;
   status?: BookStatus;
   publicationId: string;
   subjectId: string;
@@ -89,17 +109,45 @@ export interface UpdateBookDto {
   slug?: string;
   shortDescription?: string;
   description?: string;
-  isbn?: string;
-  price?: number;
-  discountPrice?: number;
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: boolean;
-  stockAmount?: number;
   status?: BookStatus;
   publicationId?: string;
   subjectId?: string;
+}
+
+export interface CreateBookPaperDto {
+  bookId: string;
+  code?: string;
+  name: string;
+  price: number;
+  discountPrice?: number;
+  discountStartDate?: string;
+  discountEndDate?: string;
+  stock?: number;
+  isbn?: string;
+  pageCount?: number;
+  thumbnail?: string;
+  sortOrder?: number;
+  isDefault?: boolean;
+  status?: "DRAFT" | "PUBLISHED";
+}
+
+export interface UpdateBookPaperDto {
+  code?: string;
+  name?: string;
+  price?: number;
+  discountPrice?: number;
+  discountStartDate?: string;
+  discountEndDate?: string;
+  stock?: number;
+  isbn?: string;
+  pageCount?: number;
+  thumbnail?: string;
+  sortOrder?: number;
+  isDefault?: boolean;
+  status?: "DRAFT" | "PUBLISHED";
 }
 
 // Publication DTOs
@@ -181,7 +229,10 @@ export interface OrderItem {
   id: string;
   orderId: string;
   bookId: string;
+  paperId?: string;
   bookTitle: string;
+  paperName?: string;
+  paperPrice?: number;
   bookPrice: number;
   quantity: number;
   subtotal: number;
@@ -289,7 +340,7 @@ export interface BookTreeBook {
   id: string;
   title: string;
   slug: string;
-  price: number;
+  priceRange?: PriceRange | null;
   thumbnail?: string;
 }
 

@@ -11,16 +11,20 @@ interface BookDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onSuccess?: () => void;
+  onBookCreated?: (bookId: string) => void;
 }
 
-export function BookDialog({ book, trigger, open, onOpenChange, onSuccess }: BookDialogProps) {
+export function BookDialog({ book, trigger, open, onOpenChange, onSuccess, onBookCreated }: BookDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   
   const isOpen = open ?? internalOpen;
   const setIsOpen = onOpenChange ?? setInternalOpen;
 
-  const handleSuccess = () => {
+  const handleSuccess = (createdBookId?: string) => {
     setIsOpen(false);
+    if (createdBookId && onBookCreated) {
+      onBookCreated(createdBookId);
+    }
     onSuccess?.();
   };
 
@@ -35,7 +39,7 @@ export function BookDialog({ book, trigger, open, onOpenChange, onSuccess }: Boo
         </DialogHeader>
         <BookForm 
           book={book} 
-          onSuccess={handleSuccess} 
+          onSuccess={() => handleSuccess(book?.id)} 
           onCancel={() => setIsOpen(false)} 
         />
       </DialogContent>

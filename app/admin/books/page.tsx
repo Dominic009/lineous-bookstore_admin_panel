@@ -67,6 +67,9 @@ export default function BooksPage() {
               Add Book
             </Button>
           }
+          onBookCreated={(bookId) => {
+            router.push(`/admin/books/${bookId}`);
+          }}
         />
       </div>
 

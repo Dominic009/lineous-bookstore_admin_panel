@@ -1,22 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PriceRange } from "@/lib/types/book";
 
-const books = [
+const books: { title: string; priceRange: PriceRange; category: string }[] = [
   {
     title: "Advanced Mathematics",
-    isbn: "978-123456",
-    stock: 50,
+    priceRange: { min: 250, max: 400, display: "From ৳250" },
     category: "Science",
   },
   {
     title: "Physics Essentials",
-    isbn: "978-654321",
-    stock: 22,
+    priceRange: { min: 300, max: 300, display: "৳300" },
     category: "Science",
   },
   {
     title: "Biology Guide",
-    isbn: "978-444555",
-    stock: 17,
+    priceRange: { min: 200, max: 350, display: "From ৳200" },
     category: "Science",
   },
 ];
@@ -32,15 +30,15 @@ export function RecentBooks() {
         <div className="space-y-3">
           {books.map((book) => (
             <div
-              key={book.isbn}
+              key={book.title}
               className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
             >
               <div className="space-y-1">
                 <h4 className="font-medium">{book.title}</h4>
-                <p className="text-sm text-muted-foreground">{book.isbn}</p>
+                <p className="text-sm text-muted-foreground">{book.priceRange.display}</p>
               </div>
 
-              <div className="text-sm font-medium">Stock: {book.stock}</div>
+              <div className="text-sm text-muted-foreground">{book.category}</div>
             </div>
           ))}
         </div>

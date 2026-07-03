@@ -6,7 +6,6 @@ import { useState, useEffect, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -32,14 +31,9 @@ type BookFormValues = {
   slug: string;
   shortDescription?: string;
   description?: string;
-  isbn?: string;
-  price: string;
-  discountPrice?: string;
   publicationDate?: string;
   edition?: string;
   language?: string;
-  stock?: boolean;
-  stockAmount?: string;
   status?: BookStatus;
   publicationId: string;
   subjectId: string;
@@ -47,7 +41,7 @@ type BookFormValues = {
 
 interface BookFormProps {
   book?: Book | null;
-  onSuccess?: () => void;
+  onSuccess?: (bookId?: string) => void;
   onCancel?: () => void;
 }
 
@@ -74,14 +68,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
         slug: book.slug,
         shortDescription: book.shortDescription || "",
         description: book.description || "",
-        isbn: book.isbn || "",
-        price: String(book.price),
-        discountPrice: book.discountPrice ? String(book.discountPrice) : "",
         publicationDate: book.publicationDate || "",
         edition: book.edition || "",
         language: book.language || "",
-        stock: book.stock ?? false,
-        stockAmount: book.stockAmount ? String(book.stockAmount) : "",
         status: book.status as BookStatus,
         publicationId: book.publicationId || "",
         subjectId: book.subjectId || "",
@@ -101,14 +90,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       slug: book?.slug || "",
       shortDescription: book?.shortDescription || "",
       description: book?.description || "",
-      isbn: book?.isbn || "",
-      price: book?.price ? String(book.price) : "",
-      discountPrice: book?.discountPrice ? String(book.discountPrice) : "",
       publicationDate: book?.publicationDate || "",
       edition: book?.edition || "",
       language: book?.language || "",
-      stock: book?.stock ?? false,
-      stockAmount: book?.stockAmount ? String(book.stockAmount) : "",
       status: (book?.status as BookStatus) || "DRAFT",
       publicationId: book?.publicationId || "",
       subjectId: book?.subjectId || "",
@@ -143,18 +127,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
     if (data.slug !== originalValues?.slug) changes.slug = data.slug;
     if (data.shortDescription !== originalValues?.shortDescription) changes.shortDescription = data.shortDescription;
     if (data.description !== originalValues?.description) changes.description = data.description;
-    if (data.isbn !== originalValues?.isbn) changes.isbn = data.isbn;
-    if (data.price !== originalValues?.price) changes.price = parseFloat(data.price) || 0;
-    if (data.discountPrice !== originalValues?.discountPrice) {
-      changes.discountPrice = data.discountPrice ? parseFloat(data.discountPrice) : undefined;
-    }
     if (data.publicationDate !== originalValues?.publicationDate) changes.publicationDate = data.publicationDate;
     if (data.edition !== originalValues?.edition) changes.edition = data.edition;
     if (data.language !== originalValues?.language) changes.language = data.language;
-    if (data.stock !== originalValues?.stock) changes.stock = data.stock;
-    if (data.stockAmount !== originalValues?.stockAmount) {
-      changes.stockAmount = data.stockAmount ? parseFloat(data.stockAmount) : undefined;
-    }
     if (data.status !== originalValues?.status) changes.status = data.status;
     if (data.publicationId !== originalValues?.publicationId) changes.publicationId = data.publicationId;
     if (data.subjectId !== originalValues?.subjectId) changes.subjectId = data.subjectId;
@@ -180,42 +155,19 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   };
 
   const onSubmit = async (data: BookFormValues) => {
-    console.log("=== Form Submit Debug ===");
-    console.log("thumbnailFile:", thumbnailFile);
-    console.log("thumbnailFile type:", thumbnailFile?.constructor.name);
-    console.log("thumbnailFile size:", thumbnailFile?.size);
-    console.log("attachmentFiles:", attachmentFiles);
-    console.log("isEditing:", isEditing);
-    console.log("========================");
-
     if (isEditing && book) {
       const { data: updateData, hasFiles } = buildPartialUpdate(data);
-      console.log("Update hasFiles:", hasFiles);
-      console.log("Update data type:", hasFiles ? "FormData" : "JSON");
-      if (hasFiles) {
-        const fd = updateData as FormData;
-        console.log("FormData entries:");
-        for (const [key, value] of fd.entries()) {
-          console.log(`  ${key}:`, value);
-        }
-      } else {
-        console.log("Update JSON:", updateData);
-      }
       await updateMutation.mutateAsync({ id: book.id, data: updateData });
+      onSuccess?.();
     } else {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("slug", data.slug);
       if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
       if (data.description) formData.append("description", data.description);
-      if (data.isbn) formData.append("isbn", data.isbn);
-      formData.append("price", data.price);
-      if (data.discountPrice) formData.append("discountPrice", data.discountPrice);
       if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
       if (data.edition) formData.append("edition", data.edition);
       if (data.language) formData.append("language", data.language);
-      if (data.stock !== undefined) formData.append("stock", String(data.stock));
-      if (data.stockAmount) formData.append("stockAmount", data.stockAmount);
       formData.append("status", data.status || "DRAFT");
       formData.append("publicationId", data.publicationId);
       formData.append("subjectId", data.subjectId);
@@ -228,10 +180,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
         formData.append("attachments", file);
       });
 
-      await createMutation.mutateAsync(formData);
+      const result = await createMutation.mutateAsync(formData);
+      onSuccess?.(result.data.id);
     }
-
-    onSuccess?.();
   };
 
   return (
@@ -278,35 +229,6 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="isbn">ISBN</Label>
-          <Input id="isbn" {...register("isbn")} placeholder="978-..." />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="price">Price *</Label>
-          <Input
-            id="price"
-            type="number"
-            step="0.01"
-            {...register("price")}
-            placeholder="0.00"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="discountPrice">Discount Price</Label>
-          <Input
-            id="discountPrice"
-            type="number"
-            step="0.01"
-            {...register("discountPrice")}
-            placeholder="0.00"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="space-y-2">
           <Label htmlFor="publicationDate">Publication Date</Label>
           <Input
             id="publicationDate"
@@ -331,46 +253,6 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             {...register("language")}
             placeholder="English"
           />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="space-y-2">
-          <Label htmlFor="stock" className="flex items-center gap-2">
-            <Checkbox
-              id="stock"
-              checked={watch("stock") || false}
-              onCheckedChange={(checked) => setValue("stock", checked as boolean)}
-            />
-            In Stock
-          </Label>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="stockAmount">Stock Amount</Label>
-          <Input
-            id="stockAmount"
-            type="number"
-            {...register("stockAmount")}
-            placeholder="0"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select
-            value={watch("status") || "DRAFT"}
-            onValueChange={(value) => setValue("status", value as BookStatus)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-              <SelectItem value="PUBLISHED">Published</SelectItem>
-              <SelectItem value="ARCHIVED">Archived</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
@@ -422,6 +304,23 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             </p>
           )}
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
+          value={watch("status") || "DRAFT"}
+          onValueChange={(value) => setValue("status", value as BookStatus)}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="DRAFT">Draft</SelectItem>
+            <SelectItem value="PUBLISHED">Published</SelectItem>
+            <SelectItem value="ARCHIVED">Archived</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">

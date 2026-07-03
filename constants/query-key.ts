@@ -20,4 +20,8 @@ export const QueryKeys = {
     reviews: ["reviews"],
 
     settings: ["settings"],
+
+    bookPapers: ["bookPapers"],
+
+    bookPapersByBook: (bookId: string) => ["bookPapers", "book", bookId],
 } as const;

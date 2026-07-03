@@ -63,13 +63,10 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
               Subject
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
-              ISBN
+              Price Range
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
-              Price
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Stock
+              Papers
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
               Status
@@ -120,20 +117,13 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
                 {book.subject?.name || book.subjectId || "-"}
               </td>
 
-              <td className="px-6 py-4 text-sm text-muted-foreground">
-                {book.isbn || "-"}
-              </td>
-
               <td className="px-6 py-4 text-sm font-medium">
-                ${book.price}
-                {book.discountPrice && (
-                  <span className="ml-2 text-xs text-muted-foreground line-through">
-                    ${book.discountPrice}
-                  </span>
-                )}
+                {book.priceRange?.display || "-"}
               </td>
 
-              <td className="px-6 py-4 text-sm">{book.stock ? "Yes" : "No"}</td>
+              <td className="px-6 py-4 text-sm">
+                {book.papers?.length ?? 0}
+              </td>
 
               <td className="px-6 py-4">
                 <StatusBadge status={book.status} />
