@@ -1,25 +1,38 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { StatusBadge } from "./status-badge";
 import { BookActions } from "./book.actions";
 import { useBooks, useDeleteBook } from "@/lib/hooks/use-books";
 import type { Book } from "@/lib/types/book";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface BooksTableProps {
   onView?: (book: Book) => void;
   onEdit?: (book: Book) => void;
   onDelete?: (book: Book) => void;
+  onAddPaper?: (book: Book) => void;
 }
 
-export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
+export function BooksTable({ onView, onEdit, onDelete, onAddPaper }: BooksTableProps) {
+  const router = useRouter();
   const { data: books, isLoading, error } = useBooks();
   const deleteMutation = useDeleteBook();
 
   const handleDelete = async (book: Book) => {
     await deleteMutation.mutateAsync(book.id);
     onDelete?.(book);
+  };
+
+  const handleAddPaper = (book: Book) => {
+    if (onAddPaper) {
+      onAddPaper(book);
+    } else {
+      router.push(`/admin/books/${book.id}`);
+    }
   };
 
   if (isLoading) {
@@ -70,6 +83,9 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground">
               Status
+            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">
+              Actions
             </th>
             <th className="px-6 py-4 font-medium text-muted-foreground"></th>
           </tr>
@@ -127,6 +143,18 @@ export function BooksTable({ onView, onEdit, onDelete }: BooksTableProps) {
 
               <td className="px-6 py-4">
                 <StatusBadge status={book.status} />
+              </td>
+
+              <td className="px-6 py-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => handleAddPaper(book)}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Paper
+                </Button>
               </td>
 
               <td className="px-6 py-4">

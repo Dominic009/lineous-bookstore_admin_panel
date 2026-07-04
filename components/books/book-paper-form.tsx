@@ -102,47 +102,75 @@ export function BookPaperForm({ bookId, paper, onSuccess, onCancel }: BookPaperF
     }
 
     if (isEditing && paper) {
-      const updateData: UpdateBookPaperDto = {
-        code: data.code || undefined,
-        name: data.name,
-        price,
-        discountPrice,
-        discountStartDate: data.discountStartDate || undefined,
-        discountEndDate: data.discountEndDate || undefined,
-        stock: parseInt(data.stock) || 0,
-        isbn: data.isbn || undefined,
-        pageCount: data.pageCount ? parseInt(data.pageCount) : undefined,
-        sortOrder: parseInt(data.sortOrder) || 0,
-        isDefault: data.isDefault,
-        status: data.status,
-      };
+      if (thumbnailFile) {
+        // Use FormData when thumbnail is being updated
+        const formData = new FormData();
+        formData.append("code", data.code || "");
+        formData.append("name", data.name);
+        formData.append("price", String(price));
+        if (discountPrice !== undefined) formData.append("discountPrice", String(discountPrice));
+        if (data.discountStartDate) formData.append("discountStartDate", data.discountStartDate);
+        if (data.discountEndDate) formData.append("discountEndDate", data.discountEndDate);
+        formData.append("stock", String(parseInt(data.stock) || 0));
+        if (data.isbn) formData.append("isbn", data.isbn);
+        if (data.pageCount) formData.append("pageCount", String(parseInt(data.pageCount)));
+        formData.append("sortOrder", String(parseInt(data.sortOrder) || 0));
+        formData.append("isDefault", String(data.isDefault));
+        formData.append("status", data.status);
+        formData.append("thumbnail", thumbnailFile);
 
-      try {
-        await updateMutation.mutateAsync({ id: paper.id, data: updateData });
-        toast.success("Paper updated successfully");
-        onSuccess?.();
-      } catch (error) {
-        console.error("Failed to update paper:", error);
+        try {
+          await updateMutation.mutateAsync({ id: paper.id, data: formData });
+          toast.success("Paper updated successfully");
+          onSuccess?.();
+        } catch (error) {
+          console.error("Failed to update paper:", error);
+        }
+      } else {
+        const updateData: UpdateBookPaperDto = {
+          code: data.code || undefined,
+          name: data.name,
+          price,
+          discountPrice,
+          discountStartDate: data.discountStartDate || undefined,
+          discountEndDate: data.discountEndDate || undefined,
+          stock: parseInt(data.stock) || 0,
+          isbn: data.isbn || undefined,
+          pageCount: data.pageCount ? parseInt(data.pageCount) : undefined,
+          sortOrder: parseInt(data.sortOrder) || 0,
+          isDefault: data.isDefault,
+          status: data.status,
+        };
+
+        try {
+          await updateMutation.mutateAsync({ id: paper.id, data: updateData });
+          toast.success("Paper updated successfully");
+          onSuccess?.();
+        } catch (error) {
+          console.error("Failed to update paper:", error);
+        }
       }
     } else {
-      const createData: CreateBookPaperDto = {
-        bookId,
-        code: data.code || undefined,
-        name: data.name,
-        price,
-        discountPrice,
-        discountStartDate: data.discountStartDate || undefined,
-        discountEndDate: data.discountEndDate || undefined,
-        stock: parseInt(data.stock) || 0,
-        isbn: data.isbn || undefined,
-        pageCount: data.pageCount ? parseInt(data.pageCount) : undefined,
-        sortOrder: parseInt(data.sortOrder) || 0,
-        isDefault: data.isDefault,
-        status: data.status,
-      };
+      const formData = new FormData();
+      formData.append("bookId", bookId);
+      if (data.code) formData.append("code", data.code);
+      formData.append("name", data.name);
+      formData.append("price", String(price));
+      if (discountPrice !== undefined) formData.append("discountPrice", String(discountPrice));
+      if (data.discountStartDate) formData.append("discountStartDate", data.discountStartDate);
+      if (data.discountEndDate) formData.append("discountEndDate", data.discountEndDate);
+      formData.append("stock", String(parseInt(data.stock) || 0));
+      if (data.isbn) formData.append("isbn", data.isbn);
+      if (data.pageCount) formData.append("pageCount", String(parseInt(data.pageCount)));
+      formData.append("sortOrder", String(parseInt(data.sortOrder) || 0));
+      formData.append("isDefault", String(data.isDefault));
+      formData.append("status", data.status);
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      }
 
       try {
-        await createMutation.mutateAsync(createData);
+        await createMutation.mutateAsync(formData);
         toast.success("Paper created successfully");
         onSuccess?.();
       } catch (error) {
@@ -287,11 +315,14 @@ export function BookPaperForm({ bookId, paper, onSuccess, onCancel }: BookPaperF
           accept="image/*"
           onChange={handleThumbnailChange}
         />
-        {thumbnailPreview && (
+        {(thumbnailPreview || (paper?.thumbnail && !thumbnailFile)) && (
           <div className="mt-2">
+            <p className="mb-1 text-sm text-muted-foreground">
+              {thumbnailFile ? "New Thumbnail Preview:" : "Current Thumbnail:"}
+            </p>
             <img
-              src={thumbnailPreview}
-              alt="Preview"
+              src={thumbnailPreview || paper?.thumbnail}
+              alt={thumbnailFile ? "Thumbnail preview" : "Current thumbnail"}
               className="h-24 w-16 rounded-md object-cover"
             />
           </div>

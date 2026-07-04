@@ -20,11 +20,7 @@ import {
   usePublications,
   useSubjects,
 } from "@/lib/hooks/use-books";
-import type {
-  Book,
-  UpdateBookDto,
-  BookStatus,
-} from "@/lib/types/book";
+import type { Book, UpdateBookDto, BookStatus } from "@/lib/types/book";
 
 type BookFormValues = {
   title: string;
@@ -103,7 +99,9 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
 
   // Filter subjects by selected publication
   const filteredSubjects = selectedPublicationId
-    ? subjects.filter((subject) => subject.publicationId === selectedPublicationId)
+    ? subjects.filter(
+        (subject) => subject.publicationId === selectedPublicationId
+      )
     : subjects;
 
   const handleThumbnailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -118,21 +116,30 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
     setAttachmentFiles((prev) => [...prev, ...files]);
   };
 
-  const buildPartialUpdate = (data: BookFormValues): { data: UpdateBookDto | FormData; hasFiles: boolean } => {
+  const buildPartialUpdate = (
+    data: BookFormValues
+  ): { data: UpdateBookDto | FormData; hasFiles: boolean } => {
     const hasFiles = !!thumbnailFile || attachmentFiles.length > 0;
     const changes: Record<string, unknown> = {};
 
     // Compare each field with original value and only include if changed
     if (data.title !== originalValues?.title) changes.title = data.title;
     if (data.slug !== originalValues?.slug) changes.slug = data.slug;
-    if (data.shortDescription !== originalValues?.shortDescription) changes.shortDescription = data.shortDescription;
-    if (data.description !== originalValues?.description) changes.description = data.description;
-    if (data.publicationDate !== originalValues?.publicationDate) changes.publicationDate = data.publicationDate;
-    if (data.edition !== originalValues?.edition) changes.edition = data.edition;
-    if (data.language !== originalValues?.language) changes.language = data.language;
+    if (data.shortDescription !== originalValues?.shortDescription)
+      changes.shortDescription = data.shortDescription;
+    if (data.description !== originalValues?.description)
+      changes.description = data.description;
+    if (data.publicationDate !== originalValues?.publicationDate)
+      changes.publicationDate = data.publicationDate;
+    if (data.edition !== originalValues?.edition)
+      changes.edition = data.edition;
+    if (data.language !== originalValues?.language)
+      changes.language = data.language;
     if (data.status !== originalValues?.status) changes.status = data.status;
-    if (data.publicationId !== originalValues?.publicationId) changes.publicationId = data.publicationId;
-    if (data.subjectId !== originalValues?.subjectId) changes.subjectId = data.subjectId;
+    if (data.publicationId !== originalValues?.publicationId)
+      changes.publicationId = data.publicationId;
+    if (data.subjectId !== originalValues?.subjectId)
+      changes.subjectId = data.subjectId;
 
     if (hasFiles) {
       // Use FormData when files are involved
@@ -163,9 +170,11 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("slug", data.slug);
-      if (data.shortDescription) formData.append("shortDescription", data.shortDescription);
+      if (data.shortDescription)
+        formData.append("shortDescription", data.shortDescription);
       if (data.description) formData.append("description", data.description);
-      if (data.publicationDate) formData.append("publicationDate", data.publicationDate);
+      if (data.publicationDate)
+        formData.append("publicationDate", data.publicationDate);
       if (data.edition) formData.append("edition", data.edition);
       if (data.language) formData.append("language", data.language);
       formData.append("status", data.status || "DRAFT");
@@ -288,7 +297,13 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
             disabled={!selectedPublicationId}
           >
             <SelectTrigger id="subjectId">
-              <SelectValue placeholder={selectedPublicationId ? "Select subject" : "Select publication first"} />
+              <SelectValue
+                placeholder={
+                  selectedPublicationId
+                    ? "Select subject"
+                    : "Select publication first"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
               {filteredSubjects.map((subject) => (

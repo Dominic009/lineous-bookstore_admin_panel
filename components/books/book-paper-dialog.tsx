@@ -45,12 +45,12 @@ export function BookPaperDialog({ bookId, paper, trigger, onSuccess, onCancel, o
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        {trigger || (
+        {/* {trigger || (
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Paper
           </Button>
-        )}
+        )} */}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[95dvh] overflow-auto">
         <DialogHeader>

@@ -103,14 +103,50 @@ export const getBookPaper = async (id: string): Promise<ApiResponse<BookPaper>> 
   return response.data;
 };
 
-// Create paper
-export const createBookPaper = async (data: CreateBookPaperDto): Promise<ApiResponse<BookPaper>> => {
+// Create paper (supports FormData for thumbnail upload)
+export const createBookPaper = async (data: CreateBookPaperDto | FormData): Promise<ApiResponse<BookPaper>> => {
+  const isFormData = data instanceof FormData;
+  const token = localStorage.getItem("accessToken");
+
+  if (isFormData) {
+    const response = await fetch(`${apiClient.defaults.baseURL}/book-papers`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: data as FormData,
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to create paper");
+    }
+    return await response.json();
+  }
+
   const response = await apiClient.post<ApiResponse<BookPaper>>("/book-papers", data);
   return response.data;
 };
 
-// Update paper
-export const updateBookPaper = async (id: string, data: UpdateBookPaperDto): Promise<ApiResponse<BookPaper>> => {
+// Update paper (supports both JSON and FormData for thumbnail uploads)
+export const updateBookPaper = async (id: string, data: UpdateBookPaperDto | FormData): Promise<ApiResponse<BookPaper>> => {
+  const isFormData = data instanceof FormData;
+  const token = localStorage.getItem("accessToken");
+
+  if (isFormData) {
+    const response = await fetch(`${apiClient.defaults.baseURL}/book-papers/${id}`, {
+      method: "PATCH",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: data as FormData,
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to update paper");
+    }
+    return await response.json();
+  }
+
   const response = await apiClient.patch<ApiResponse<BookPaper>>(`/book-papers/${id}`, data);
   return response.data;
 };

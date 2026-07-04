@@ -129,17 +129,17 @@ export function useBookPapers(bookId: string) {
   });
 }
 
-// Hook to create paper
+// Hook to create paper (supports FormData for thumbnail upload)
 export function useCreateBookPaper() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateBookPaperDto) => {
+    mutationFn: async (data: CreateBookPaperDto | FormData) => {
       const response = await booksApi.createBookPaper(data);
       return response;
     },
     onSuccess: (response, variables) => {
-      queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapersByBook(variables.bookId) });
+      queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapersByBook((variables as CreateBookPaperDto).bookId) });
       queryClient.invalidateQueries({ queryKey: QueryKeys.books });
       toast.success(response.message || "Paper created successfully");
     },
@@ -149,16 +149,16 @@ export function useCreateBookPaper() {
   });
 }
 
-// Hook to update paper
+// Hook to update paper (supports both JSON and FormData for thumbnail uploads)
 export function useUpdateBookPaper() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateBookPaperDto }) => {
+    mutationFn: async ({ id, data }: { id: string; data: UpdateBookPaperDto | FormData }) => {
       const response = await booksApi.updateBookPaper(id, data);
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: QueryKeys.books });
       queryClient.invalidateQueries({ queryKey: QueryKeys.bookPapers });
       toast.success(response.message || "Paper updated successfully");

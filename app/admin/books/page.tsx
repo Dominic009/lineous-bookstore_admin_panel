@@ -88,7 +88,12 @@ export default function BooksPage() {
         </Button>
       </div>
 
-      <BooksTable onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
+      <BooksTable
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAddPaper={(book) => router.push(`/admin/books/${book.id}`)}
+      />
 
       {/* Edit Dialog */}
       <BookDialog

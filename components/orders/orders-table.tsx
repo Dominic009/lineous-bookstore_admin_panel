@@ -110,7 +110,7 @@ export function OrdersTable({ onView, onEdit }: OrdersTableProps) {
               </td>
 
               <td className="px-6 py-4 text-sm font-medium">
-                ${order.total.toFixed(2)}
+                ${order.total}
               </td>
 
               <td className="px-6 py-4">
