@@ -6,13 +6,6 @@ import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -22,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { ReviewsTable } from "@/components/reviews/reviews-table";
 import { ReviewDialog } from "@/components/reviews/review-dialog";
 import { useBooks } from "@/lib/hooks/use-books";
@@ -79,18 +72,16 @@ export default function ReviewsPage() {
 
       <div className="flex items-center gap-4">
         <div className="w-full max-w-md">
-          <Select value={selectedBookId} onValueChange={setSelectedBookId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a book to manage reviews" />
-            </SelectTrigger>
-            <SelectContent>
-              {books.map((book) => (
-                <SelectItem key={book.id} value={book.id}>
-                  {book.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableDropdown
+            items={books.map((book) => ({ id: book.id, label: book.title }))}
+            value={selectedBookId}
+            onChange={(item) => {
+              if (item) setSelectedBookId(item.id as string);
+            }}
+            placeholder="Select a book to manage reviews"
+            buttonClassName="w-full h-10"
+            loading={!books || books.length === 0}
+          />
         </div>
 
         <div className="relative flex-1 max-w-md">

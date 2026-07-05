@@ -5,13 +5,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 
 import { OrdersTable } from "@/components/orders/orders-table";
 import type { Order, OrderStatus } from "@/lib/types/book";
@@ -48,19 +42,15 @@ export default function OrdersPage() {
           />
         </div>
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {OrderStatusEnum.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0) + status.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableDropdown
+          items={[{ id: "all", label: "All Statuses" }, ...OrderStatusEnum.map((status) => ({ id: status, label: status.charAt(0) + status.slice(1).toLowerCase() }))]}
+          value={statusFilter}
+          onChange={(item) => {
+            if (item) setStatusFilter(item.id as string);
+          }}
+          placeholder="Filter by status"
+          buttonClassName="w-[180px] h-10"
+        />
 
         <Button variant="outline" className="gap-2 rounded-md">
           <SlidersHorizontal className="h-4 w-4" />

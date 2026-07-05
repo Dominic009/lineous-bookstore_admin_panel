@@ -4,14 +4,7 @@ import { useOrders, useUpdateOrderStatus } from "@/lib/hooks/use-orders";
 import type { Order, OrderStatus } from "@/lib/types/book";
 import { OrderActions } from "./order.actions";
 import { StatusBadge } from "@/components/books/status-badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 
 interface OrdersTableProps {
   onView?: (order: Order) => void;
@@ -114,21 +107,14 @@ export function OrdersTable({ onView, onEdit }: OrdersTableProps) {
               </td>
 
               <td className="px-6 py-4">
-                <Select
+                <SearchableDropdown
+                  items={orderStatusOptions.map((status) => ({ id: status.value, label: status.label }))}
                   value={order.status}
-                  onValueChange={(value) => handleStatusChange(order.id, value as OrderStatus)}
-                >
-                  <SelectTrigger className="h-8 w-[140px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {orderStatusOptions.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(item) => {
+                    if (item) handleStatusChange(order.id, item.id as OrderStatus);
+                  }}
+                  buttonClassName="h-8 w-[140px]"
+                />
               </td>
 
               <td className="px-6 py-4">

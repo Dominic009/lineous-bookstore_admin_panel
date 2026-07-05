@@ -4,14 +4,8 @@ import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import {
   useCreateUser,
   useUpdateUser,
@@ -143,40 +137,26 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="role">Role</Label>
-          <Select
+          <SearchableDropdown
+            items={UserRoleEnum.map((role) => ({ id: role, label: role }))}
             value={watch("role") || "USER"}
-            onValueChange={(value) => setValue("role", value as UserRole)}
-          >
-            <SelectTrigger id="role">
-              <SelectValue placeholder="Select role" />
-            </SelectTrigger>
-            <SelectContent>
-              {UserRoleEnum.map((role: UserRole) => (
-                <SelectItem key={role} value={role}>
-                  {role}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(item) => {
+              if (item) setValue("role", item.id as UserRole);
+            }}
+            placeholder="Select role"
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>
-          <Select
+          <SearchableDropdown
+            items={UserStatusEnum.map((status) => ({ id: status, label: status.charAt(0) + status.slice(1).toLowerCase() }))}
             value={watch("status") || "ACTIVE"}
-            onValueChange={(value) => setValue("status", value as UserStatus)}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              {UserStatusEnum.map((status: UserStatus) => (
-                <SelectItem key={status} value={status}>
-                  {status.charAt(0) + status.slice(1).toLowerCase()}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={(item) => {
+              if (item) setValue("status", item.id as UserStatus);
+            }}
+            placeholder="Select status"
+          />
         </div>
       </div>
 

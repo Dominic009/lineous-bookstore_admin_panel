@@ -15,14 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { UsersTable } from "@/components/users/users-table";
 import { UserDialog } from "@/components/users/user-dialog";
 import type { User, UserRole, UserStatus } from "@/lib/types/book";
@@ -82,33 +75,25 @@ export default function UsersPage() {
           />
         </div>
 
-        <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filter by role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            {UserRoleEnum.map((role) => (
-              <SelectItem key={role} value={role}>
-                {role}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableDropdown
+          items={[{ id: "all", label: "All Roles" }, ...UserRoleEnum.map((role) => ({ id: role, label: role }))]}
+          value={roleFilter}
+          onChange={(item) => {
+            if (item) setRoleFilter(item.id as string);
+          }}
+          placeholder="Filter by role"
+          buttonClassName="w-[150px] h-10"
+        />
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            {UserStatusEnum.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0) + status.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableDropdown
+          items={[{ id: "all", label: "All Statuses" }, ...UserStatusEnum.map((status) => ({ id: status, label: status.charAt(0) + status.slice(1).toLowerCase() }))]}
+          value={statusFilter}
+          onChange={(item) => {
+            if (item) setStatusFilter(item.id as string);
+          }}
+          placeholder="Filter by status"
+          buttonClassName="w-[150px] h-10"
+        />
 
         <Button variant="outline" className="gap-2 rounded-md">
           <SlidersHorizontal className="h-4 w-4" />

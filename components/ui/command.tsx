@@ -121,8 +121,9 @@ function CommandSeparator({
 
 function CommandItem({
   className,
+  onSelect,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { onSelect?: () => void }) {
   return (
     <div
       data-slot="command-item"
@@ -132,6 +133,7 @@ function CommandItem({
         "aria-selected:bg-muted aria-selected:text-foreground",
         className
       )}
+      onClick={onSelect}
       {...props}
     />
   )

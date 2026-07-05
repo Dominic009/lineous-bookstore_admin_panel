@@ -6,14 +6,8 @@ import { useState, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { toast } from "sonner";
 import { useCreateBookPaper, useUpdateBookPaper } from "@/lib/hooks/use-books";
 import type { BookPaper, CreateBookPaperDto, UpdateBookPaperDto } from "@/lib/types/book";
@@ -346,18 +340,17 @@ export function BookPaperForm({ bookId, paper, onSuccess, onCancel }: BookPaperF
 
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>
-          <Select
+          <SearchableDropdown
+            items={[
+              { id: "DRAFT", label: "Draft" },
+              { id: "PUBLISHED", label: "Published" },
+            ]}
             value={watch("status")}
-            onValueChange={(value) => setValue("status", value as "DRAFT" | "PUBLISHED")}
-          >
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-              <SelectItem value="PUBLISHED">Published</SelectItem>
-            </SelectContent>
-          </Select>
+            onChange={(item) => {
+              if (item) setValue("status", item.id as "DRAFT" | "PUBLISHED");
+            }}
+            placeholder="Select status"
+          />
         </div>
       </div>
 

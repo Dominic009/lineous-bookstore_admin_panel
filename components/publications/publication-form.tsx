@@ -6,13 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { Label } from "@/components/ui/label";
 import {
   useCreatePublication,
@@ -129,21 +123,14 @@ export function PublicationForm({ publication, onSuccess, onCancel }: Publicatio
 
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Select
+        <SearchableDropdown
+          items={BookStatusEnum.map((status) => ({ id: status, label: status.charAt(0) + status.slice(1).toLowerCase() }))}
           value={watch("status") || "PUBLISHED"}
-          onValueChange={(value) => setValue("status", value as BookStatus)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            {BookStatusEnum.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0) + status.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          onChange={(item) => {
+            if (item) setValue("status", item.id as BookStatus);
+          }}
+          placeholder="Select status"
+        />
       </div>
 
       <div className="flex items-center justify-between rounded-lg border border-border/60 p-4">

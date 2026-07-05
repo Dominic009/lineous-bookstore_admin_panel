@@ -6,13 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { Label } from "@/components/ui/label";
 import {
   useCreateSubject,
@@ -103,21 +97,14 @@ export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) 
 
       <div className="space-y-2">
         <Label htmlFor="publicationId">Publication</Label>
-        <Select
+        <SearchableDropdown
+          items={publications.map((pub) => ({ id: pub.id, label: pub.name }))}
           value={watch("publicationId") || ""}
-          onValueChange={(value) => setValue("publicationId", value || undefined)}
-        >
-          <SelectTrigger id="publicationId">
-            <SelectValue placeholder="Select publication (optional)" />
-          </SelectTrigger>
-          <SelectContent>
-            {publications.map((pub) => (
-              <SelectItem key={pub.id} value={pub.id}>
-                {pub.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            onChange={(item) => {
+              if (item) setValue("publicationId", String(item.id) || undefined);
+            }}
+          placeholder="Select publication (optional)"
+        />
         <p className="text-xs text-muted-foreground">
           Optionally link this subject to a publication
         </p>

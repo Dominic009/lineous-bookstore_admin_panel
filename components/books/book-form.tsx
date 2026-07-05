@@ -6,14 +6,8 @@ import { useState, useEffect, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import {
   useCreateBook,
   useUpdateBook,
@@ -268,51 +262,30 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="publicationId">Publication *</Label>
-          <Select
+          <SearchableDropdown
+            items={publications.map((pub) => ({ id: pub.id, label: pub.name }))}
             value={watch("publicationId") || ""}
-            onValueChange={(value) => {
-              setValue("publicationId", value);
-              // Reset subject when publication changes
-              setValue("subjectId", "");
-            }}
-          >
-            <SelectTrigger id="publicationId">
-              <SelectValue placeholder="Select publication" />
-            </SelectTrigger>
-            <SelectContent>
-              {publications.map((pub) => (
-                <SelectItem key={pub.id} value={pub.id}>
-                  {pub.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              onChange={(item) => {
+                if (item) {
+                  setValue("publicationId", String(item.id));
+                  setValue("subjectId", "");
+                }
+              }}
+            placeholder="Select publication"
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="subjectId">Subject *</Label>
-          <Select
+          <SearchableDropdown
+            items={filteredSubjects.map((subject) => ({ id: subject.id, label: subject.name }))}
             value={watch("subjectId") || ""}
-            onValueChange={(value) => setValue("subjectId", value)}
+              onChange={(item) => {
+                if (item) setValue("subjectId", String(item.id));
+              }}
+            placeholder={selectedPublicationId ? "Select subject" : "Select publication first"}
             disabled={!selectedPublicationId}
-          >
-            <SelectTrigger id="subjectId">
-              <SelectValue
-                placeholder={
-                  selectedPublicationId
-                    ? "Select subject"
-                    : "Select publication first"
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {filteredSubjects.map((subject) => (
-                <SelectItem key={subject.id} value={subject.id}>
-                  {subject.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
           {!selectedPublicationId && (
             <p className="text-xs text-muted-foreground">
               Please select a publication first
@@ -323,19 +296,18 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Select
+        <SearchableDropdown
+          items={[
+            { id: "DRAFT", label: "Draft" },
+            { id: "PUBLISHED", label: "Published" },
+            { id: "ARCHIVED", label: "Archived" },
+          ]}
           value={watch("status") || "DRAFT"}
-          onValueChange={(value) => setValue("status", value as BookStatus)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="DRAFT">Draft</SelectItem>
-            <SelectItem value="PUBLISHED">Published</SelectItem>
-            <SelectItem value="ARCHIVED">Archived</SelectItem>
-          </SelectContent>
-        </Select>
+          onChange={(item) => {
+            if (item) setValue("status", item.id as BookStatus);
+          }}
+          placeholder="Select status"
+        />
       </div>
 
       <div className="space-y-2">
