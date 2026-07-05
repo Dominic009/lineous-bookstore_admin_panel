@@ -14,6 +14,8 @@ import {
   usePublications,
   useSubjects,
 } from "@/lib/hooks/use-books";
+import { PublicationDialog } from "@/components/publications/publication-dialog";
+import { SubjectDialog } from "@/components/subjects/subject-dialog";
 import type { Book, UpdateBookDto, BookStatus } from "@/lib/types/book";
 
 type BookFormValues = {
@@ -39,6 +41,8 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
+  const [isPublicationDialogOpen, setIsPublicationDialogOpen] = useState(false);
+  const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
   const isEditing = !!book;
 
   // Create preview URL for selected thumbnail
@@ -94,7 +98,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   // Filter subjects by selected publication
   const filteredSubjects = selectedPublicationId
     ? subjects.filter(
-        (subject) => subject.publicationId === selectedPublicationId
+        (subject) => subject.publicationId === selectedPublicationId,
       )
     : subjects;
 
@@ -111,7 +115,7 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
   };
 
   const buildPartialUpdate = (
-    data: BookFormValues
+    data: BookFormValues,
   ): { data: UpdateBookDto | FormData; hasFiles: boolean } => {
     const hasFiles = !!thumbnailFile || attachmentFiles.length > 0;
     const changes: Record<string, unknown> = {};
@@ -188,151 +192,182 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
     }
   };
 
+  // Render inline dialogs outside the form content
+  const renderInlineDialogs = () => (
+    <>
+      <PublicationDialog
+        open={isPublicationDialogOpen}
+        onOpenChange={setIsPublicationDialogOpen}
+      />
+      <SubjectDialog
+        open={isSubjectDialogOpen}
+        onOpenChange={setIsSubjectDialogOpen}
+      />
+    </>
+  );
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              {...register("title")}
+              placeholder="Enter book title"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="slug">Slug *</Label>
+            <Input
+              id="slug"
+              {...register("slug")}
+              placeholder="enter-book-slug"
+            />
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <Label htmlFor="title">Title *</Label>
-          <Input
-            id="title"
-            {...register("title")}
-            placeholder="Enter book title"
+          <Label htmlFor="shortDescription">Short Description</Label>
+          <Textarea
+            id="shortDescription"
+            {...register("shortDescription")}
+            placeholder="Brief description of the book"
+            rows={2}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="slug">Slug *</Label>
-          <Input
-            id="slug"
-            {...register("slug")}
-            placeholder="enter-book-slug"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="shortDescription">Short Description</Label>
-        <Textarea
-          id="shortDescription"
-          {...register("shortDescription")}
-          placeholder="Brief description of the book"
-          rows={2}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          {...register("description")}
-          placeholder="Full book description"
-          rows={4}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="space-y-2">
-          <Label htmlFor="publicationDate">Publication Date</Label>
-          <Input
-            id="publicationDate"
-            type="date"
-            {...register("publicationDate")}
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            {...register("description")}
+            placeholder="Full book description"
+            rows={4}
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="edition">Edition</Label>
-          <Input
-            id="edition"
-            {...register("edition")}
-            placeholder="1st Edition"
-          />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="publicationDate">Publication Date</Label>
+            <Input
+              id="publicationDate"
+              type="date"
+              {...register("publicationDate")}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edition">Edition</Label>
+            <Input
+              id="edition"
+              {...register("edition")}
+              placeholder="1st Edition"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="language">Language</Label>
+            <Input
+              id="language"
+              {...register("language")}
+              placeholder="English"
+            />
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="language">Language</Label>
-          <Input
-            id="language"
-            {...register("language")}
-            placeholder="English"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="publicationId">Publication *</Label>
-          <SearchableDropdown
-            items={publications.map((pub) => ({ id: pub.id, label: pub.name }))}
-            value={watch("publicationId") || ""}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="publicationId">Publication *</Label>
+            <SearchableDropdown
+              items={publications.map((pub) => ({
+                id: pub.id,
+                label: pub.name,
+              }))}
+              value={watch("publicationId") || ""}
               onChange={(item) => {
                 if (item) {
                   setValue("publicationId", String(item.id));
                   setValue("subjectId", "");
                 }
               }}
-            placeholder="Select publication"
+              placeholder="Select publication"
+              onAddNewClick={() => setIsPublicationDialogOpen(true)}
+              addNewLabel="Publication"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subjectId">Subject *</Label>
+            <SearchableDropdown
+              items={filteredSubjects.map((subject) => ({
+                id: subject.id,
+                label: subject.name,
+              }))}
+              value={watch("subjectId") || ""}
+              onChange={(item) => {
+                if (item) setValue("subjectId", String(item.id));
+              }}
+              placeholder={
+                selectedPublicationId
+                  ? "Select subject"
+                  : "Select publication first"
+              }
+              disabled={!selectedPublicationId}
+              onAddNewClick={() => setIsSubjectDialogOpen(true)}
+              addNewLabel="Subject"
+            />
+            {!selectedPublicationId && (
+              <p className="text-xs text-muted-foreground">
+                Please select a publication first
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <SearchableDropdown
+            items={[
+              { id: "DRAFT", label: "Draft" },
+              { id: "PUBLISHED", label: "Published" },
+              { id: "ARCHIVED", label: "Archived" },
+            ]}
+            value={watch("status") || "DRAFT"}
+            onChange={(item) => {
+              if (item) setValue("status", item.id as BookStatus);
+            }}
+            placeholder="Select status"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subjectId">Subject *</Label>
-          <SearchableDropdown
-            items={filteredSubjects.map((subject) => ({ id: subject.id, label: subject.name }))}
-            value={watch("subjectId") || ""}
-              onChange={(item) => {
-                if (item) setValue("subjectId", String(item.id));
-              }}
-            placeholder={selectedPublicationId ? "Select subject" : "Select publication first"}
-            disabled={!selectedPublicationId}
+          <Label htmlFor="thumbnail">Thumbnail (Book Cover)</Label>
+          <Input
+            id="thumbnail"
+            type="file"
+            accept="image/*"
+            onChange={handleThumbnailChange}
           />
-          {!selectedPublicationId && (
-            <p className="text-xs text-muted-foreground">
-              Please select a publication first
-            </p>
+          {(thumbnailPreview || (book?.thumbnail && !thumbnailFile)) && (
+            <div className="mt-2">
+              <p className="mb-1 text-sm text-muted-foreground">
+                {thumbnailFile
+                  ? "New Thumbnail Preview:"
+                  : "Current Thumbnail:"}
+              </p>
+              <img
+                src={thumbnailPreview || book?.thumbnail}
+                alt={thumbnailFile ? "Thumbnail preview" : "Current thumbnail"}
+                className="h-32 w-24 rounded-md object-cover"
+              />
+            </div>
           )}
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <SearchableDropdown
-          items={[
-            { id: "DRAFT", label: "Draft" },
-            { id: "PUBLISHED", label: "Published" },
-            { id: "ARCHIVED", label: "Archived" },
-          ]}
-          value={watch("status") || "DRAFT"}
-          onChange={(item) => {
-            if (item) setValue("status", item.id as BookStatus);
-          }}
-          placeholder="Select status"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="thumbnail">Thumbnail (Book Cover)</Label>
-        <Input
-          id="thumbnail"
-          type="file"
-          accept="image/*"
-          onChange={handleThumbnailChange}
-        />
-        {(thumbnailPreview || (book?.thumbnail && !thumbnailFile)) && (
-          <div className="mt-2">
-            <p className="mb-1 text-sm text-muted-foreground">
-              {thumbnailFile ? "New Thumbnail Preview:" : "Current Thumbnail:"}
-            </p>
-            <img
-              src={thumbnailPreview || book?.thumbnail}
-              alt={thumbnailFile ? "Thumbnail preview" : "Current thumbnail"}
-              className="h-32 w-24 rounded-md object-cover"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* <div className="space-y-2">
+        {/* <div className="space-y-2">
         <Label htmlFor="attachments">Additional Attachments</Label>
         <Input
           id="attachments"
@@ -348,23 +383,25 @@ export function BookForm({ book, onSuccess, onCancel }: BookFormProps) {
         )}
       </div> */}
 
-      <div className="flex justify-end gap-2">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
+        <div className="flex justify-end gap-2">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+          <Button
+            type="submit"
+            disabled={createMutation.isPending || updateMutation.isPending}
+          >
+            {createMutation.isPending || updateMutation.isPending
+              ? "Saving..."
+              : isEditing
+                ? "Update Book"
+                : "Create Book"}
           </Button>
-        )}
-        <Button
-          type="submit"
-          disabled={createMutation.isPending || updateMutation.isPending}
-        >
-          {createMutation.isPending || updateMutation.isPending
-            ? "Saving..."
-            : isEditing
-            ? "Update Book"
-            : "Create Book"}
-        </Button>
-      </div>
-    </form>
+        </div>
+      </form>
+      {renderInlineDialogs()}
+    </>
   );
 }

@@ -1,24 +1,18 @@
 "use client";
 
 import { use } from "react";
+import { useState } from "react";
 import {
   ArrowLeft,
   Star,
   BookOpen,
   Tag,
   Hash,
-  DollarSign,
-  Package,
   Calendar,
   FileText,
-  ShoppingCart,
-  Plus,
-  Eye,
-  Edit3,
-  Trash2,
-  TrendingUp,
   Users,
   Clock,
+  Edit3,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,10 +20,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ReviewDialog } from "@/components/reviews/review-dialog";
+import { BookDialog } from "@/components/books/book-dialog";
 import { useBook } from "@/lib/hooks/use-books";
 import { useReviews } from "@/lib/hooks/use-reviews";
 import { useRouter } from "next/navigation";
-import type { Book, Review } from "@/lib/types/book";
+import type { Review } from "@/lib/types/book";
 import { StatusBadge } from "@/components/books/status-badge";
 import { BookPapersManager } from "@/components/books/book-papers-manager";
 
@@ -58,6 +53,7 @@ function StarRating({ rating }: { rating: number }) {
 export default function BookDetailPage({ params }: BookDetailPageProps) {
   const { id } = use(params);
   const router = useRouter();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { data: book, isLoading, error } = useBook(id);
   const { data: reviews } = useReviews(id);
 
@@ -245,22 +241,20 @@ export default function BookDetailPage({ params }: BookDetailPageProps) {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-3">
-              <Button
-                className="gap-2"
-                variant="default"
-                onClick={() => router.push(`/admin/books/${book.id}/edit`)}
-              >
-                <Edit3 className="h-4 w-4" />
-                Edit Book
-              </Button>
-              {/* <Button
-                variant="outline"
-                className="gap-2"
-                onClick={() => router.push(`/admin/books`)}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Books
-              </Button> */}
+              <BookDialog
+                book={book}
+                open={isEditDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
+                onSuccess={() => {
+                  // The useUpdateBook hook already invalidates queries on success
+                }}
+                trigger={
+                  <Button className="gap-2" variant="default">
+                    <Edit3 className="h-4 w-4" />
+                    Edit Book
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>

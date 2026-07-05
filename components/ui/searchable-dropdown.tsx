@@ -40,6 +40,7 @@ interface SearchableDropdownProps {
   addNewEndpoint?: string;
   addNewPayloadBuilder?: (searchValue: string) => Record<string, unknown>;
   onAddNewSuccess?: (newItem: SearchableDropdownItem) => void;
+  onAddNewClick?: () => void;
   renderItem?: (item: SearchableDropdownItem, isSelected: boolean) => React.ReactNode;
 }
 
@@ -58,6 +59,7 @@ export function SearchableDropdown({
   addNewEndpoint,
   addNewPayloadBuilder,
   onAddNewSuccess,
+  onAddNewClick,
   renderItem,
 }: SearchableDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -129,6 +131,8 @@ export function SearchableDropdown({
     !loading &&
     !isCreating;
 
+  const showCreateButton = onAddNewClick && !loading;
+
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -179,6 +183,21 @@ export function SearchableDropdown({
               </div>
             )}
             
+            {showCreateButton && (
+              <CommandItem
+                onSelect={() => {
+                  setOpen(false);
+                  onAddNewClick();
+                }}
+                className="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 aria-selected:bg-blue-100"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                <span className="flex-1 font-medium">
+                  Add {addNewLabel}
+                </span>
+              </CommandItem>
+            )}
+
             {showAddNewOption && (
               <CommandItem
                 onSelect={handleAddNew}
