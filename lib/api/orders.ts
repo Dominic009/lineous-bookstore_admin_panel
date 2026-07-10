@@ -1,5 +1,13 @@
 import apiClient from "./axios";
-import type { Order, CreateOrderDto, UpdateOrderStatusDto, ApiResponse } from "@/lib/types/book";
+import type {
+  Order,
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+  ApiResponse,
+  ReceiptDetails,
+  ReceiptVerification,
+  GenerateReceiptResponse,
+} from "@/lib/types/book";
 
 // Get all orders
 export const getOrders = async (): Promise<ApiResponse<Order[]>> => {
@@ -25,11 +33,43 @@ export const updateOrderStatus = async (id: string, dto: UpdateOrderStatusDto): 
   return response.data;
 };
 
+// Generate (or regenerate) a receipt for an order (Admin only)
+export const generateReceipt = async (id: string): Promise<ApiResponse<GenerateReceiptResponse>> => {
+  const response = await apiClient.post<ApiResponse<GenerateReceiptResponse>>(`/orders/${id}/receipt`);
+  return response.data;
+};
+
+// Get detailed receipt information for an order
+export const getReceiptDetails = async (id: string): Promise<ApiResponse<ReceiptDetails>> => {
+  const response = await apiClient.get<ApiResponse<ReceiptDetails>>(`/orders/${id}/receipt/details`);
+  return response.data;
+};
+
+// Download the PDF receipt for an order (returns a binary blob)
+export const downloadReceipt = async (id: string): Promise<Blob> => {
+  const response = await apiClient.get<Blob>(`/orders/${id}/receipt`, {
+    responseType: "blob",
+  });
+  return response.data;
+};
+
+// Public: verify a receipt by its receipt number
+export const verifyReceipt = async (receiptNumber: string): Promise<ApiResponse<ReceiptVerification>> => {
+  const response = await apiClient.get<ApiResponse<ReceiptVerification>>(
+    `/receipts/verify/${receiptNumber}`
+  );
+  return response.data;
+};
+
 export const ordersApi = {
   getOrders,
   getOrder,
   createOrder,
   updateOrderStatus,
+  generateReceipt,
+  getReceiptDetails,
+  downloadReceipt,
+  verifyReceipt,
 };
 
 export default ordersApi;

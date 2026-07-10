@@ -7,6 +7,10 @@ export const QueryKeys = {
 
     orders: ["orders"],
 
+    receiptDetails: (orderId: string) => ["orders", orderId, "receipt"],
+
+    verifyReceipt: (receiptNumber: string) => ["receipts", "verify", receiptNumber],
+
     publications: ["publications"],
 
     subjects: ["subjects"],

@@ -1,33 +1,28 @@
 "use client";
 
-import { useOrders, useUpdateOrderStatus } from "@/lib/hooks/use-orders";
+import { Download, Loader2 } from "lucide-react";
+
+import { useOrders, useUpdateOrderStatus, useDownloadReceipt } from "@/lib/hooks/use-orders";
 import type { Order, OrderStatus } from "@/lib/types/book";
 import { OrderActions } from "./order.actions";
-import { StatusBadge } from "@/components/books/status-badge";
+import { PaymentStatusBadge } from "./order-badges";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
+import { Button } from "@/components/ui/button";
+import { getNextOrderStatuses, OrderStatusLabels } from "@/constants/status";
+import { formatBDT } from "@/lib/utils";
 
 interface OrdersTableProps {
   onView?: (order: Order) => void;
-  onEdit?: (order: Order) => void;
 }
 
-const orderStatusOptions: { value: OrderStatus; label: string }[] = [
-  { value: "PENDING", label: "Pending" },
-  { value: "CONFIRMED", label: "Confirmed" },
-  { value: "PROCESSING", label: "Processing" },
-  { value: "SHIPPED", label: "Shipped" },
-  { value: "DELIVERED", label: "Delivered" },
-  { value: "CANCELLED", label: "Cancelled" },
-  { value: "RETURNED", label: "Returned" },
-];
-
-export function OrdersTable({ onView, onEdit }: OrdersTableProps) {
+export function OrdersTable({ onView }: OrdersTableProps) {
   const { data: orders, isLoading, error } = useOrders();
   const updateStatusMutation = useUpdateOrderStatus();
+  const downloadReceipt = useDownloadReceipt();
 
-  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
-    await updateStatusMutation.mutateAsync({ id: orderId, data: { status: newStatus } });
-    onEdit?.({ ...orders!.find((o) => o.id === orderId)!, status: newStatus } as Order);
+  const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
+    if (newStatus === order.status) return;
+    await updateStatusMutation.mutateAsync({ id: order.id, data: { status: newStatus } });
   };
 
   if (isLoading) {
@@ -61,79 +56,94 @@ export function OrdersTable({ onView, onEdit }: OrdersTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Order
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Customer
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Total
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Status
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Payment
-            </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
-              Date
-            </th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Order</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Customer</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Total</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Status</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Payment</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Date</th>
             <th className="px-6 py-4 font-medium text-muted-foreground"></th>
           </tr>
         </thead>
 
         <tbody>
-          {orders.map((order) => (
-            <tr
-              key={order.id}
-              className="border-b border-border/40 transition-colors last:border-0 hover:bg-muted/20"
-            >
-              <td className="px-6 py-4">
-                <div>
-                  <h4 className="font-medium">{order.orderNumber}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {order.orderItems?.length || 0} items
-                  </p>
-                </div>
-              </td>
+          {orders.map((order) => {
+            const nextStatuses = getNextOrderStatuses(order.status);
+            const statusOptions = [
+              { id: order.status, label: OrderStatusLabels[order.status] },
+              ...nextStatuses.map((s) => ({ id: s, label: OrderStatusLabels[s] })),
+            ];
+            const customerName = order.user
+              ? `${order.user.firstName ?? ""} ${order.user.lastName ?? ""}`.trim() ||
+                order.userId.slice(0, 8)
+              : order.userId.slice(0, 8);
 
-              <td className="px-6 py-4 text-sm text-muted-foreground">
-                {order.userId.slice(0, 8)}...
-              </td>
+            return (
+              <tr
+                key={order.id}
+                className="border-b border-border/40 transition-colors last:border-0 hover:bg-muted/20"
+              >
+                <td className="px-6 py-4">
+                  <div>
+                    <h4 className="font-medium">{order.orderNumber}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {order.orderItems?.length || 0} items
+                    </p>
+                  </div>
+                </td>
 
-              <td className="px-6 py-4 text-sm font-medium">
-                ${order.total}
-              </td>
+                <td className="px-6 py-4">
+                  <div>
+                    <p className="text-sm font-medium">{customerName}</p>
+                    {order.user?.email && (
+                      <p className="text-sm text-muted-foreground">{order.user.email}</p>
+                    )}
+                  </div>
+                </td>
 
-              <td className="px-6 py-4">
-                <SearchableDropdown
-                  items={orderStatusOptions.map((status) => ({ id: status.value, label: status.label }))}
-                  value={order.status}
-                  onChange={(item) => {
-                    if (item) handleStatusChange(order.id, item.id as OrderStatus);
-                  }}
-                  buttonClassName="h-8 w-[140px]"
-                />
-              </td>
+                <td className="px-6 py-4 text-sm font-medium">{formatBDT(order.total)}</td>
 
-              <td className="px-6 py-4">
-                <StatusBadge status={order.paymentStatus as "PUBLISHED" | "DRAFT" | "ARCHIVED"} />
-              </td>
+                <td className="px-6 py-4">
+                  <SearchableDropdown
+                    items={statusOptions}
+                    value={order.status}
+                    onChange={(item) => {
+                      if (item) handleStatusChange(order, item.id as OrderStatus);
+                    }}
+                    buttonClassName="h-8 w-[150px]"
+                  />
+                </td>
 
-              <td className="px-6 py-4 text-sm text-muted-foreground">
-                {new Date(order.createdAt).toLocaleDateString()}
-              </td>
+                <td className="px-6 py-4">
+                  <PaymentStatusBadge status={order.paymentStatus} />
+                </td>
 
-              <td className="px-6 py-4">
-                <OrderActions
-                  order={order}
-                  onView={() => onView?.(order)}
-                  onEdit={() => onEdit?.(order)}
-                />
-              </td>
-            </tr>
-          ))}
+                <td className="px-6 py-4 text-sm text-muted-foreground">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </td>
+
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="rounded-md"
+                      title="Download receipt"
+                      disabled={downloadReceipt.isPending}
+                      onClick={() => downloadReceipt.mutate(order.id)}
+                    >
+                      {downloadReceipt.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <OrderActions order={order} onView={() => onView?.(order)} />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

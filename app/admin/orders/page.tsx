@@ -8,18 +8,18 @@ import { Input } from "@/components/ui/input";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 
 import { OrdersTable } from "@/components/orders/orders-table";
-import type { Order, OrderStatus } from "@/lib/types/book";
+import { OrderDetailDialog } from "@/components/orders/order-detail-dialog";
+import type { Order } from "@/lib/types/book";
 import { OrderStatus as OrderStatusEnum } from "@/constants/status";
 
 export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const handleView = (order: Order) => {
-    console.log("View order:", order.id);
-  };
-
-  const handleEdit = (order: Order) => {
-    console.log("Update order status:", order.id);
+    setSelectedOrder(order);
+    setDetailOpen(true);
   };
 
   return (
@@ -58,7 +58,13 @@ export default function OrdersPage() {
         </Button>
       </div>
 
-      <OrdersTable onView={handleView} onEdit={handleEdit} />
+      <OrdersTable onView={handleView} />
+
+      <OrderDetailDialog
+        orderId={selectedOrder?.id ?? null}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
     </div>
   );
 }

@@ -225,6 +225,12 @@ export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 
 export type PaymentMethod = "COD" | "CARD" | "BANK_TRANSFER" | "MOBILE_BANKING";
 
+export interface OrderItemPaper {
+  id: string;
+  name: string;
+  price: string;
+}
+
 export interface OrderItem {
   id: string;
   orderId: string;
@@ -232,10 +238,39 @@ export interface OrderItem {
   paperId?: string;
   bookTitle: string;
   paperName?: string;
-  paperPrice?: number;
-  bookPrice: number;
+  paperPrice?: string;
   quantity: number;
-  subtotal: number;
+  subtotal: string;
+  paper?: OrderItemPaper;
+}
+
+export interface Payment {
+  id: string;
+  orderId: string;
+  gateway: string;
+  transactionId?: string | null;
+  amount: string;
+  currency: string;
+  status: PaymentStatus;
+  paidAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderUser {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface OrderAddress {
+  id: string;
+  name?: string;
+  phone?: string;
+  district?: string;
+  addressLine?: string;
 }
 
 export interface Order {
@@ -243,10 +278,10 @@ export interface Order {
   userId: string;
   addressId?: string;
   orderNumber: string;
-  subtotal: number;
-  discount?: number;
-  shipping?: number;
-  total: number;
+  subtotal: string;
+  discount?: string;
+  shipping?: string;
+  total: string;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
   paymentMethod?: PaymentMethod;
@@ -255,6 +290,9 @@ export interface Order {
   updatedAt: string;
   deletedAt?: string;
   orderItems?: OrderItem[];
+  payments?: Payment[];
+  user?: OrderUser;
+  address?: OrderAddress;
 }
 
 // Order DTOs
@@ -268,6 +306,57 @@ export interface CreateOrderDto {
 
 export interface UpdateOrderStatusDto {
   status: OrderStatus;
+}
+
+// Receipt types
+export interface ReceiptOrder {
+  id: string;
+  orderNumber: string;
+  subtotal: string;
+  discount: string;
+  shipping: string;
+  total: string;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod?: PaymentMethod;
+  orderItems?: OrderItem[];
+  address?: OrderAddress;
+  user?: OrderUser;
+}
+
+export interface Receipt {
+  id: string;
+  orderId: string;
+  receiptNumber: string;
+  pdfUrl: string;
+  publicId: string;
+  qrCodeUrl: string;
+  generatedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  order?: ReceiptOrder;
+}
+
+export type ReceiptDetails = Receipt;
+
+export interface ReceiptVerification {
+  id: string;
+  orderId: string;
+  receiptNumber: string;
+  pdfUrl: string;
+  qrCodeUrl: string;
+  generatedAt: string;
+  order: {
+    orderNumber: string;
+    total: string;
+    status: OrderStatus;
+    orderItems?: OrderItem[];
+  };
+}
+
+export interface GenerateReceiptResponse {
+  pdfUrl: string;
+  receiptNumber: string;
 }
 
 // User types
