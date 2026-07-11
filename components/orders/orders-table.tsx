@@ -5,7 +5,7 @@ import { Download, Loader2 } from "lucide-react";
 import { useOrders, useUpdateOrderStatus, useDownloadReceipt } from "@/lib/hooks/use-orders";
 import type { Order, OrderStatus } from "@/lib/types/book";
 import { OrderActions } from "./order.actions";
-import { PaymentStatusBadge } from "./order-badges";
+import { OrderStatusBadge, PaymentStatusBadge } from "./order-badges";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { Button } from "@/components/ui/button";
 import { getNextOrderStatuses, OrderStatusLabels } from "@/constants/status";
@@ -111,6 +111,9 @@ export function OrdersTable({ onView }: OrdersTableProps) {
                       if (item) handleStatusChange(order, item.id as OrderStatus);
                     }}
                     buttonClassName="h-8 w-[150px]"
+                    renderSelected={(item) => (
+                      <OrderStatusBadge status={item.id as OrderStatus} />
+                    )}
                   />
                 </td>
 

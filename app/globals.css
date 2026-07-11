@@ -187,3 +187,155 @@
     background: oklch(0.16 0.025 260 / 0.8);
   }
 }
+
+/* ===== ANIMATED GRADIENTS ===== */
+@layer utilities {
+  .bg-gradient-animated {
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+  }
+
+  .bg-gradient-aurora {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.94 0.04 260),
+      oklch(0.92 0.06 280),
+      oklch(0.93 0.03 200),
+      oklch(0.91 0.05 260),
+      oklch(0.94 0.04 260)
+    );
+  }
+
+  .bg-gradient-aurora-dark {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  .bg-gradient-warm {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.95 0.04 90),
+      oklch(0.93 0.06 75),
+      oklch(0.94 0.04 85),
+      oklch(0.92 0.05 70),
+      oklch(0.95 0.04 90)
+    );
+  }
+
+  .bg-gradient-warm-dark {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  .bg-gradient-cool {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.94 0.04 220),
+      oklch(0.92 0.06 260),
+      oklch(0.93 0.03 180),
+      oklch(0.91 0.05 240),
+      oklch(0.94 0.04 220)
+    );
+  }
+
+  .bg-gradient-cool-dark {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.2 0.04 260),
+      oklch(0.18 0.05 280),
+      oklch(0.19 0.03 200),
+      oklch(0.17 0.04 260),
+      oklch(0.2 0.04 260)
+    );
+  }
+
+  .bg-gradient-sunset {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.95 0.05 30),
+      oklch(0.93 0.07 60),
+      oklch(0.94 0.04 90),
+      oklch(0.92 0.06 45),
+      oklch(0.95 0.05 30)
+    );
+  }
+
+  .bg-gradient-sunset-dark {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  .dark .bg-gradient-aurora {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  .dark .bg-gradient-warm {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  .dark .bg-gradient-cool {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.2 0.04 260),
+      oklch(0.18 0.05 280),
+      oklch(0.19 0.03 200),
+      oklch(0.17 0.04 260),
+      oklch(0.2 0.04 260)
+    );
+  }
+
+  .dark .bg-gradient-sunset {
+    background: linear-gradient(
+      -45deg,
+      oklch(0.22 0.04 260),
+      oklch(0.2 0.05 280),
+      oklch(0.21 0.03 200),
+      oklch(0.19 0.04 260),
+      oklch(0.22 0.04 260)
+    );
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+}

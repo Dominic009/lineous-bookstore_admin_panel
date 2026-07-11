@@ -1,27 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { orderStatusConfig } from "@/constants/status";
+import type { RecentOrder } from "@/lib/types/book";
 
-const orders = [
-  {
-    id: "#ORD-001",
-    customer: "John Doe",
-    amount: "$120",
-    status: "Completed",
-  },
-  {
-    id: "#ORD-002",
-    customer: "Sarah Smith",
-    amount: "$95",
-    status: "Processing",
-  },
-  {
-    id: "#ORD-003",
-    customer: "Alex Brown",
-    amount: "$210",
-    status: "Completed",
-  },
-];
+interface RecentOrdersProps {
+  orders: RecentOrder[];
+}
 
-export function RecentOrders() {
+export function RecentOrders({ orders }: RecentOrdersProps) {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <Card className="border-border/60 shadow-card">
       <CardHeader className="pb-4">
@@ -29,26 +25,45 @@ export function RecentOrders() {
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-3">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
-            >
-              <div className="space-y-1">
-                <h4 className="font-medium">{order.id}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {order.customer}
-                </p>
-              </div>
+        {orders.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No recent orders found
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {orders.map((order) => {
+              const config = orderStatusConfig[order.status] || {
+                label: order.status,
+                variant: "secondary" as const,
+                color: "bg-gray-100 text-gray-800",
+              };
 
-              <div className="text-right">
-                <div className="font-semibold">{order.amount}</div>
-                <div className="text-xs text-emerald-600">{order.status}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+              return (
+                <div
+                  key={order.orderNumber}
+                  className="flex items-center justify-between rounded-md border border-border/60 bg-muted/20 p-4 transition-colors hover:bg-muted/40"
+                >
+                  <div className="space-y-1">
+                    <h4 className="font-medium">{order.orderNumber}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {order.customerName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(order.createdAt)}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="font-semibold">৳{order.total.toLocaleString()}</div>
+                    <Badge variant={config.variant} className={`${config.color} mt-1`}>
+                      {config.label}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

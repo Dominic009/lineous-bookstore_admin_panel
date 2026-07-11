@@ -7,6 +7,7 @@ import {
   FolderTree,
   Star,
   Building2,
+  BarChart3,
 } from "lucide-react";
 
 export const navigation = [
@@ -47,6 +48,12 @@ export const navigation = [
     title: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+
+  {
+    title: "Sales Analytics",
+    href: "/admin/analytics/sales",
+    icon: BarChart3,
   },
 
   // {

@@ -141,6 +141,19 @@ export function useVerifyReceipt(receiptNumber: string, enabled = true) {
   });
 }
 
+// Hook to fetch order status statistics
+export function useOrderStatusStats() {
+  return useQuery({
+    queryKey: QueryKeys.orderStatusStats,
+    queryFn: async () => {
+      const response = await ordersApi.getOrderStatusStats();
+      return response ?? { stats: [], totalOrders: 0 };
+    },
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    retry: 1,
+  });
+}
+
 // Helper function to extract error message from backend response
 function getErrorMessage(error: unknown): string {
   if (error instanceof AxiosError) {

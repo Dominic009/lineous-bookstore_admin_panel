@@ -18,8 +18,11 @@ import {
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { UsersTable } from "@/components/users/users-table";
 import { UserDialog } from "@/components/users/user-dialog";
+import { CustomerStats } from "@/components/users/customer-stats";
+import { TopCustomers } from "@/components/users/top-customers";
 import type { User, UserRole, UserStatus } from "@/lib/types/book";
 import { UserRole as UserRoleEnum, UserStatus as UserStatusEnum } from "@/constants/status";
+import { useCustomerInsights } from "@/lib/hooks/use-analytics";
 
 export default function UsersPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -28,6 +31,8 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const { data: customerData, isLoading: customerLoading } = useCustomerInsights();
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -66,6 +71,11 @@ export default function UsersPage() {
         />
       </div>
 
+      {/* Customer Stats */}
+      {!customerLoading && customerData && (
+        <CustomerStats summary={customerData.summary} />
+      )}
+
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -103,6 +113,11 @@ export default function UsersPage() {
 
       <UsersTable onEdit={handleEdit} onDelete={handleDelete} />
 
+      {/* Top Customers */}
+      {!customerLoading && customerData && customerData.topCustomers.length > 0 && (
+        <TopCustomers customers={customerData.topCustomers} />
+      )}
+
       {/* Edit Dialog */}
       <UserDialog
         user={selectedUser}
@@ -116,7 +131,7 @@ export default function UsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &#34;{selectedUser?.email}&#34;? This action will soft delete the user.
+              Are you sure you want to delete &quot;{selectedUser?.email}&quot;? This action will soft delete the user.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

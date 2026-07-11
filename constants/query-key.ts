@@ -28,4 +28,25 @@ export const QueryKeys = {
     bookPapers: ["bookPapers"],
 
     bookPapersByBook: (bookId: string) => ["bookPapers", "book", bookId],
+
+    // Dashboard & Analytics
+    dashboard: ["dashboard"],
+
+    dashboardStats: ["dashboard", "stats"],
+
+    salesAnalytics: (params: { period: string; startDate?: string; endDate?: string; groupBy?: string }) =>
+      ["analytics", "sales", params] as const,
+
+    salesPeriod: (params: { period: string; date?: string }) =>
+      ["sales", "period", params] as const,
+
+    orderStatusStats: ["orders", "status-stats"],
+
+    topSellingBooks: (params: { limit?: number; period?: string }) =>
+      ["books", "top-selling", params] as const,
+
+    inventoryOverview: ["inventory", "overview"],
+
+    customerInsights: (params: { period?: string }) =>
+      ["analytics", "customers", params] as const,
 } as const;

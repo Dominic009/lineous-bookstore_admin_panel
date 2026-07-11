@@ -42,6 +42,7 @@ interface SearchableDropdownProps {
   onAddNewSuccess?: (newItem: SearchableDropdownItem) => void;
   onAddNewClick?: () => void;
   renderItem?: (item: SearchableDropdownItem, isSelected: boolean) => React.ReactNode;
+  renderSelected?: (item: SearchableDropdownItem) => React.ReactNode;
 }
 
 export function SearchableDropdown({
@@ -61,6 +62,7 @@ export function SearchableDropdown({
   onAddNewSuccess,
   onAddNewClick,
   renderItem,
+  renderSelected,
 }: SearchableDropdownProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -147,10 +149,8 @@ export function SearchableDropdown({
             buttonClassName
           )}
         >
-          <span
-            className={selectedItem ? "text-slate-900" : "font-medium text-gray-500"}
-          >
-            {selectedItem ? selectedItem.label : placeholder}
+          <span className={selectedItem ? "text-slate-900" : "font-medium text-gray-500"}>
+            {selectedItem ? (renderSelected ? renderSelected(selectedItem) : selectedItem.label) : placeholder}
           </span>
           <ChevronsUpDown className="h-4 w-4 shrink-0 text-slate-400" />
         </Button>

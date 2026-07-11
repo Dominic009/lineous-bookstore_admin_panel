@@ -219,7 +219,14 @@ export interface Review {
 }
 
 // Order types
-export type OrderStatus = "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED";
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "RETURNED";
 
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 
@@ -451,4 +458,234 @@ export interface BookTreePublication {
     isActive: boolean;
   };
   subjects: BookTreeSubject[];
+}
+
+// ==================== Dashboard & Analytics Types ====================
+
+export interface DashboardKpis {
+  totalProducts: number;
+  totalOrders: number;
+  totalSales: number;
+  totalCustomers: number;
+  totalSubjects: number;
+  totalPublications: number;
+  pendingOrders: number;
+  lowStockBooks: number;
+}
+
+export interface OrderStatusBreakdown {
+  status: OrderStatus;
+  count: number;
+  percentage: number;
+}
+
+export interface TopSellingBook {
+  rank: number;
+  bookId: string;
+  title: string;
+  publication: string;
+  subject: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  coverImage?: string;
+}
+
+export interface RecentOrder {
+  orderNumber: string;
+  customerName: string;
+  total: number;
+  status: OrderStatus;
+  createdAt: string;
+}
+
+export interface SalesTrend {
+  today: number;
+  thisWeek: number;
+  thisMonth: number;
+}
+
+export interface DashboardData {
+  kpis: DashboardKpis;
+  orderStatusBreakdown: OrderStatusBreakdown[];
+  topSellingBooks: TopSellingBook[];
+  recentOrders: RecentOrder[];
+  salesTrend: SalesTrend;
+}
+
+export interface DashboardResponse {
+  status: string;
+  data: DashboardData;
+}
+
+// Sales Analytics types
+export interface DateRange {
+  start: string;
+  end: string;
+}
+
+export interface SalesSummary {
+  totalRevenue: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  totalItemsSold: number;
+}
+
+export interface TimeSeriesData {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface TopProduct {
+  rank: number;
+  bookId: string;
+  title: string;
+  quantitySold: number;
+  revenue: number;
+}
+
+export interface PaymentMethodBreakdown {
+  method: PaymentMethod;
+  count: number;
+  revenue: number;
+}
+
+export interface SalesAnalyticsData {
+  period: string;
+  dateRange: DateRange;
+  summary: SalesSummary;
+  timeSeriesData: TimeSeriesData[];
+  topProducts: TopProduct[];
+  paymentMethodBreakdown: PaymentMethodBreakdown[];
+}
+
+export type SalesAnalyticsResponse = SalesAnalyticsData;
+
+export interface SalesAnalyticsParams {
+  period: "day" | "week" | "month" | "year" | "custom";
+  startDate?: string;
+  endDate?: string;
+  groupBy?: "day" | "week" | "month";
+}
+
+// Top Selling Books types
+export interface TopSellingBookDetail {
+  rank: number;
+  bookId: string;
+  title: string;
+  slug: string;
+  publication: string;
+  subject: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  currentStock: number;
+  coverImage?: string;
+  averageRating?: number;
+}
+
+export interface TopSellingBooksResponse {
+  status: string;
+  data: {
+    books: TopSellingBookDetail[];
+  };
+}
+
+export interface TopSellingBooksParams {
+  limit?: number;
+  period?: "all" | "month" | "week";
+}
+
+// Order Status Stats types
+export interface OrderStatusStat {
+  status: OrderStatus;
+  count: number;
+  percentage: number;
+}
+
+export interface OrderStatusStatsResponse {
+  status: string;
+  stats: OrderStatusStat[];
+  totalOrders: number;
+}
+
+// Sales by Period types
+export interface SalesPeriodData {
+  period: string;
+  date: string;
+  totalSales: number;
+  totalOrders: number;
+  currency: string;
+}
+
+export interface SalesPeriodResponse {
+  status: string;
+  data: SalesPeriodData;
+}
+
+export interface SalesPeriodParams {
+  period: "day" | "week" | "month";
+  date?: string;
+}
+
+// Inventory Overview types
+export interface InventorySummary {
+  totalBooks: number;
+  publishedBooks: number;
+  draftBooks: number;
+  archivedBooks: number;
+  outOfStock: number;
+  lowStock: number;
+}
+
+export interface LowStockBook {
+  bookId: string;
+  title: string;
+  paperName: string;
+  currentStock: number;
+  threshold: number;
+}
+
+export interface OutOfStockBook {
+  bookId: string;
+  title: string;
+  paperName: string;
+}
+
+export interface InventoryOverviewData {
+  summary: InventorySummary;
+  lowStockBooks: LowStockBook[];
+  outOfStockBooks: OutOfStockBook[];
+}
+
+export interface InventoryOverviewResponse {
+  status: string;
+  data: InventoryOverviewData;
+}
+
+// Customer Insights types
+export interface CustomerSummary {
+  totalCustomers: number;
+  newCustomersThisMonth: number;
+  activeCustomers: number;
+  repeatCustomers: number;
+}
+
+export interface TopCustomer {
+  userId: string;
+  name: string;
+  email: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastOrderAt: string;
+}
+
+export interface CustomerInsightsData {
+  summary: CustomerSummary;
+  topCustomers: TopCustomer[];
+}
+
+export type CustomerInsightsResponse = CustomerInsightsData;
+
+export interface CustomerInsightsParams {
+  period?: "month" | "year" | "all";
 }

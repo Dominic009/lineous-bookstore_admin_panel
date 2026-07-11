@@ -19,7 +19,10 @@ import {
 
 import { BooksTable } from "@/components/books/books-table";
 import { BookDialog } from "@/components/books/book-dialog";
+import { InventoryStats } from "@/components/books/inventory-stats";
+import { LowStockAlert } from "@/components/books/low-stock-alert";
 import type { Book } from "@/lib/types/book";
+import { useInventoryOverview } from "@/lib/hooks/use-inventory";
 
 export default function BooksPage() {
   const router = useRouter();
@@ -27,6 +30,9 @@ export default function BooksPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
+  const { data: inventoryData, isLoading: inventoryLoading } =
+    useInventoryOverview();
 
   const handleView = (book: Book) => {
     router.push(`/admin/books/${book.id}`);
@@ -73,6 +79,11 @@ export default function BooksPage() {
         />
       </div>
 
+      {/* Inventory Stats */}
+      {!inventoryLoading && inventoryData && (
+        <InventoryStats summary={inventoryData.summary} />
+      )}
+
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -95,6 +106,14 @@ export default function BooksPage() {
         onAddPaper={(book) => router.push(`/admin/books/${book.id}`)}
       />
 
+      {/* Low Stock Alerts */}
+      {/* {!inventoryLoading && inventoryData && (
+        <LowStockAlert
+          lowStockBooks={inventoryData.lowStockBooks}
+          outOfStockBooks={inventoryData.outOfStockBooks}
+        />
+      )} */}
+
       {/* Edit Dialog */}
       <BookDialog
         book={selectedBook}
@@ -103,12 +122,16 @@ export default function BooksPage() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Book</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &#34;{selectedBook?.title}&#34;? This action will soft delete the book.
+              Are you sure you want to delete &quot;{selectedBook?.title}&quot;?
+              This action will soft delete the book.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

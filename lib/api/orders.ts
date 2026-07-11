@@ -7,6 +7,7 @@ import type {
   ReceiptDetails,
   ReceiptVerification,
   GenerateReceiptResponse,
+  OrderStatusStatsResponse,
 } from "@/lib/types/book";
 
 // Get all orders
@@ -61,6 +62,12 @@ export const verifyReceipt = async (receiptNumber: string): Promise<ApiResponse<
   return response.data;
 };
 
+// Get order status statistics (admin only)
+export const getOrderStatusStats = async (): Promise<OrderStatusStatsResponse> => {
+  const response = await apiClient.get<OrderStatusStatsResponse>("/admin/orders/status-stats");
+  return response.data;
+};
+
 export const ordersApi = {
   getOrders,
   getOrder,
@@ -70,6 +77,7 @@ export const ordersApi = {
   getReceiptDetails,
   downloadReceipt,
   verifyReceipt,
+  getOrderStatusStats,
 };
 
 export default ordersApi;
