@@ -3,6 +3,7 @@ import type {
   Order,
   CreateOrderDto,
   UpdateOrderStatusDto,
+  UpdateOrderShippingDto,
   ApiResponse,
   ReceiptDetails,
   ReceiptVerification,
@@ -31,6 +32,12 @@ export const createOrder = async (dto: CreateOrderDto): Promise<ApiResponse<Orde
 // Update order status
 export const updateOrderStatus = async (id: string, dto: UpdateOrderStatusDto): Promise<ApiResponse<Order>> => {
   const response = await apiClient.patch<ApiResponse<Order>>(`/orders/${id}/status`, dto);
+  return response.data;
+};
+
+// Update order shipping (delivery charge)
+export const updateOrderShipping = async (id: string, shipping: number): Promise<ApiResponse<Order>> => {
+  const response = await apiClient.patch<ApiResponse<Order>>(`/orders/${id}/shipping`, { shipping });
   return response.data;
 };
 
@@ -73,6 +80,7 @@ export const ordersApi = {
   getOrder,
   createOrder,
   updateOrderStatus,
+  updateOrderShipping,
   generateReceipt,
   getReceiptDetails,
   downloadReceipt,

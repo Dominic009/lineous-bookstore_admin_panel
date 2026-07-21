@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { OrderStatusBadge, PaymentStatusBadge } from "./order-badges";
+import { SetShippingDialog } from "./set-shipping-dialog";
 import {
   useOrder,
   useUpdateOrderStatus,
@@ -33,6 +34,8 @@ import {
   User,
   MapPin,
   CreditCard,
+  Truck,
+  AlertTriangle,
 } from "lucide-react";
 
 interface OrderDetailDialogProps {
@@ -48,6 +51,7 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
   const generateReceipt = useGenerateReceipt();
   const downloadReceipt = useDownloadReceipt();
   const [verifyRequested, setVerifyRequested] = useState(false);
+  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
   const verifyReceipt = useVerifyReceipt(receipt?.receiptNumber ?? "", verifyRequested);
 
   const nextStatuses = order ? getNextOrderStatuses(order.status) : [];
@@ -56,6 +60,12 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
     if (!orderId) return;
     await updateStatus.mutateAsync({ id: orderId, data: { status } });
   };
+
+  const isShippingStale = order && receipt?.order
+    ? parseFloat(receipt.order.shipping) !== parseFloat(order.shipping ?? "0")
+    : false;
+
+  const isShippingMissing = order ? parseFloat(order.shipping ?? "0") === 0 : true;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,7 +96,7 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
                 </div>
                 <div className="flex items-center gap-2">
                   <OrderStatusBadge status={order.status} />
-                  <PaymentStatusBadge status={order.paymentStatus} />
+                  {/* <PaymentStatusBadge status={order.paymentStatus} /> */}
                 </div>
               </div>
             </DialogHeader>
@@ -95,7 +105,25 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
             <div className="grid grid-cols-2 gap-4 rounded-xl border border-border/60 bg-muted/30 p-4 sm:grid-cols-4">
               <Summary label="Subtotal" value={formatBDT(order.subtotal)} />
               <Summary label="Discount" value={formatBDT(order.discount)} />
-              <Summary label="Shipping" value={formatBDT(order.shipping)} />
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Shipping</p>
+                  {/* {isShippingMissing && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 px-2 text-xs text-amber-600 hover:text-amber-700"
+                      onClick={() => setShippingDialogOpen(true)}
+                    >
+                      <Truck className="mr-1 h-3 w-3" />
+                      Set
+                    </Button>
+                  )} */}
+                </div>
+                <p className={cn("mt-1 font-medium", isShippingMissing && "text-amber-600")}>
+                  {formatBDT(order.shipping)}
+                </p>
+              </div>
               <Summary label="Total" value={formatBDT(order.total)} emphasize />
             </div>
 
@@ -118,13 +146,23 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
                 </span>
               )}
               {updateStatus.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              <div className="ml-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShippingDialogOpen(true)}
+                >
+                  <Truck className="mr-2 h-4 w-4" />
+                  Set Delivery Charge
+                </Button>
+              </div>
             </div>
 
             <Tabs defaultValue="items" className="w-full">
               <TabsList variant="line" className="w-full justify-start">
                 <TabsTrigger value="items">Items</TabsTrigger>
-                <TabsTrigger value="payments">Payments</TabsTrigger>
-                <TabsTrigger value="customer">Customer</TabsTrigger>
+                {/* <TabsTrigger value="payments">Payments</TabsTrigger>
+                <TabsTrigger value="customer">Customer</TabsTrigger> */}
                 <TabsTrigger value="receipt">Receipt</TabsTrigger>
               </TabsList>
 
@@ -132,26 +170,36 @@ export function OrderDetailDialog({ orderId, open, onOpenChange }: OrderDetailDi
                 <OrderItemsTable order={order} />
               </TabsContent>
 
-              <TabsContent value="payments" className="mt-4">
+              {/* <TabsContent value="payments" className="mt-4">
                 <PaymentsList order={order} />
-              </TabsContent>
-
+              </TabsContent> */}
+{/* 
               <TabsContent value="customer" className="mt-4">
                 <CustomerAddress order={order} />
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="receipt" className="mt-4">
                 <ReceiptSection
                   orderId={order.id}
+                  order={order}
                   receipt={receipt}
                   generateReceipt={generateReceipt}
                   downloadReceipt={downloadReceipt}
                   verifyReceipt={verifyReceipt}
                   verifyRequested={verifyRequested}
                   onVerify={() => setVerifyRequested(true)}
+                  isShippingStale={isShippingStale}
+                  onRegenerateAfterShipping={() => generateReceipt.mutate(order.id)}
+                  onSetShipping={() => setShippingDialogOpen(true)}
                 />
               </TabsContent>
             </Tabs>
+
+            <SetShippingDialog
+              order={order}
+              open={shippingDialogOpen}
+              onOpenChange={setShippingDialogOpen}
+            />
           </>
         )}
       </DialogContent>
@@ -280,42 +328,78 @@ function CustomerAddress({ order }: { order: Order }) {
 
 function ReceiptSection({
   orderId,
+  order,
   receipt,
   generateReceipt,
   downloadReceipt,
   verifyReceipt,
   verifyRequested,
   onVerify,
+  isShippingStale,
+  onRegenerateAfterShipping,
+  onSetShipping,
 }: {
   orderId: string;
+  order: Order;
   receipt?: ReceiptDetails;
   generateReceipt: ReturnType<typeof useGenerateReceipt>;
   downloadReceipt: ReturnType<typeof useDownloadReceipt>;
   verifyReceipt: ReturnType<typeof useVerifyReceipt>;
   verifyRequested: boolean;
   onVerify: () => void;
+  isShippingStale: boolean;
+  onRegenerateAfterShipping: () => void;
+  onSetShipping: () => void;
 }) {
+  const isShippingMissing = order ? parseFloat(order.shipping ?? "0") === 0 : true;
+  const isPending = order.status === "PENDING";
+
   if (!receipt) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/60 p-8 text-center">
         <FileText className="h-8 w-8 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          No receipt has been generated for this order yet.
-        </p>
-        <Button onClick={() => generateReceipt.mutate(orderId)} disabled={generateReceipt.isPending}>
-          {generateReceipt.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <FileText className="h-4 w-4" />
-          )}
-          Generate Receipt
-        </Button>
+        {isShippingMissing ? (
+          <>
+            <div className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+              <AlertTriangle className="h-4 w-4" />
+              Set the delivery charge before generating the receipt.
+            </div>
+            <Button variant="outline" onClick={onSetShipping} disabled={generateReceipt.isPending}>
+              {generateReceipt.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Truck className="mr-2 h-4 w-4" />
+              )}
+              Set Delivery Charge First
+            </Button>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">
+              No receipt has been generated for this order yet.
+            </p>
+            <Button onClick={() => generateReceipt.mutate(orderId)} disabled={generateReceipt.isPending}>
+              {generateReceipt.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              {isPending ? "Generate Receipt & Confirm Order" : "Generate Receipt"}
+            </Button>
+          </>
+        )}
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
+      {isShippingStale && (
+        <div className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+          <AlertTriangle className="h-4 w-4" />
+          The delivery charge has been updated since this receipt was generated. Please regenerate to include the latest amount.
+        </div>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/60 p-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Receipt Number</p>
@@ -339,7 +423,7 @@ function ReceiptSection({
             Download
           </Button>
           <Button
-            variant="outline"
+            variant={isShippingStale ? "default" : "outline"}
             size="sm"
             onClick={() => generateReceipt.mutate(orderId)}
             disabled={generateReceipt.isPending}
@@ -349,7 +433,7 @@ function ReceiptSection({
             ) : (
               <RefreshCw className="h-4 w-4" />
             )}
-            Regenerate
+            {isShippingStale ? "Regenerate (Updated)" : isPending ? "Regenerate & Confirm" : "Regenerate"}
           </Button>
           <Button variant="outline" size="sm" asChild>
             <a href={receipt.pdfUrl} target="_blank" rel="noopener noreferrer">

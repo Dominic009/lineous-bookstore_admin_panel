@@ -1,13 +1,14 @@
 "use client";
 
-import { Download, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Download, Loader2, Eye, Truck, FileText } from "lucide-react";
 
-import { useOrders, useUpdateOrderStatus, useDownloadReceipt } from "@/lib/hooks/use-orders";
+import { useOrders, useUpdateOrderStatus, useDownloadReceipt, useGenerateReceipt } from "@/lib/hooks/use-orders";
 import type { Order, OrderStatus } from "@/lib/types/book";
-import { OrderActions } from "./order.actions";
 import { OrderStatusBadge, PaymentStatusBadge } from "./order-badges";
 import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { Button } from "@/components/ui/button";
+import { SetShippingDialog } from "./set-shipping-dialog";
 import { getNextOrderStatuses, OrderStatusLabels } from "@/constants/status";
 import { formatBDT } from "@/lib/utils";
 
@@ -19,11 +20,22 @@ export function OrdersTable({ onView }: OrdersTableProps) {
   const { data: orders, isLoading, error } = useOrders();
   const updateStatusMutation = useUpdateOrderStatus();
   const downloadReceipt = useDownloadReceipt();
+  const generateReceipt = useGenerateReceipt();
+  const [shippingOrder, setShippingOrder] = useState<Order | null>(null);
+  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
+  const [pendingActions, setPendingActions] = useState<Record<string, "download" | "generate" | "shipping">>({});
 
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
     if (newStatus === order.status) return;
     await updateStatusMutation.mutateAsync({ id: order.id, data: { status: newStatus } });
   };
+
+  const openShippingDialog = (order: Order) => {
+    setShippingOrder(order);
+    setShippingDialogOpen(true);
+  };
+
+  const isPending = (orderId: string, action: "download" | "generate" | "shipping") => pendingActions[orderId] === action;
 
   if (isLoading) {
     return (
@@ -59,8 +71,9 @@ export function OrdersTable({ onView }: OrdersTableProps) {
             <th className="px-6 py-4 font-medium text-muted-foreground">Order</th>
             <th className="px-6 py-4 font-medium text-muted-foreground">Customer</th>
             <th className="px-6 py-4 font-medium text-muted-foreground">Total</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Status</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Payment</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Shipping</th>
+            <th className="px-6 py-4 font-medium text-muted-foreground">Order Status</th>
+            {/* <th className="px-6 py-4 font-medium text-muted-foreground">Payment</th> */}
             <th className="px-6 py-4 font-medium text-muted-foreground">Date</th>
             <th className="px-6 py-4 font-medium text-muted-foreground"></th>
           </tr>
@@ -103,6 +116,14 @@ export function OrdersTable({ onView }: OrdersTableProps) {
 
                 <td className="px-6 py-4 text-sm font-medium">{formatBDT(order.total)}</td>
 
+                <td className="px-6 py-4 text-sm">
+                  {parseFloat(order.shipping ?? "0") > 0 ? (
+                    <span className="font-medium">{formatBDT(order.shipping)}</span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </td>
+
                 <td className="px-6 py-4">
                   <SearchableDropdown
                     items={statusOptions}
@@ -117,9 +138,9 @@ export function OrdersTable({ onView }: OrdersTableProps) {
                   />
                 </td>
 
-                <td className="px-6 py-4">
+                {/* <td className="px-6 py-4">
                   <PaymentStatusBadge status={order.paymentStatus} />
-                </td>
+                </td> */}
 
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {new Date(order.createdAt).toLocaleDateString()}
@@ -127,21 +148,80 @@ export function OrdersTable({ onView }: OrdersTableProps) {
 
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
+                    {order.status === "PENDING" && parseFloat(order.shipping ?? "0") === 0 ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-md"
+                        title="Set delivery charge"
+                        onClick={() => openShippingDialog(order)}
+                      >
+                        <Truck className="h-4 w-4" />
+                        <span className="ml-2 hidden sm:inline">Set Charge</span>
+                      </Button>
+                    ) : order.status === "PENDING" && parseFloat(order.shipping ?? "0") > 0 ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-md"
+                        title="Generate receipt and confirm order"
+                        disabled={isPending(order.id, "generate")}
+                        onClick={() => {
+                          setPendingActions((prev) => ({ ...prev, [order.id]: "generate" }));
+                          generateReceipt.mutate(order.id, {
+                            onSettled: () => {
+                              setPendingActions((prev) => {
+                                const next = { ...prev };
+                                delete next[order.id];
+                                return next;
+                              });
+                            },
+                          });
+                        }}
+                      >
+                        {isPending(order.id, "generate") ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <FileText className="h-4 w-4" />
+                        )}
+                        <span className="ml-2 hidden sm:inline">Generate Receipt</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-md"
+                        title="Download receipt"
+                        disabled={isPending(order.id, "download")}
+                        onClick={() => {
+                          setPendingActions((prev) => ({ ...prev, [order.id]: "download" }));
+                          downloadReceipt.mutate(order.id, {
+                            onSettled: () => {
+                              setPendingActions((prev) => {
+                                const next = { ...prev };
+                                delete next[order.id];
+                                return next;
+                              });
+                            },
+                          });
+                        }}
+                      >
+                        {isPending(order.id, "download") ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       className="rounded-md"
-                      title="Download receipt"
-                      disabled={downloadReceipt.isPending}
-                      onClick={() => downloadReceipt.mutate(order.id)}
+                      title="View order"
+                      onClick={() => onView?.(order)}
                     >
-                      {downloadReceipt.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Download className="h-4 w-4" />
-                      )}
+                      <Eye className="h-4 w-4" />
                     </Button>
-                    <OrderActions order={order} onView={() => onView?.(order)} />
                   </div>
                 </td>
               </tr>
@@ -149,6 +229,11 @@ export function OrdersTable({ onView }: OrdersTableProps) {
           })}
         </tbody>
       </table>
+      <SetShippingDialog
+        order={shippingOrder}
+        open={shippingDialogOpen}
+        onOpenChange={setShippingDialogOpen}
+      />
     </div>
   );
 }

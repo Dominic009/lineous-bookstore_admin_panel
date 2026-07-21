@@ -315,6 +315,10 @@ export interface UpdateOrderStatusDto {
   status: OrderStatus;
 }
 
+export interface UpdateOrderShippingDto {
+  shipping: number;
+}
+
 // Receipt types
 export interface ReceiptOrder {
   id: string;

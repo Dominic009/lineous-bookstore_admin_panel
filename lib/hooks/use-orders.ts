@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { ordersApi } from "@/lib/api/orders";
 import { QueryKeys } from "@/constants/query-key";
-import type { CreateOrderDto, UpdateOrderStatusDto } from "@/lib/types/book";
+import type { CreateOrderDto, UpdateOrderStatusDto, UpdateOrderShippingDto } from "@/lib/types/book";
 
 // Hook to fetch all orders
 export function useOrders() {
@@ -74,6 +74,28 @@ export function useUpdateOrderStatus() {
   });
 }
 
+// Hook to update order shipping (delivery charge)
+export function useUpdateOrderShipping() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, shipping }: { id: string; shipping: number }) => {
+      const response = await ordersApi.updateOrderShipping(id, shipping);
+      return response;
+    },
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.orders });
+      queryClient.invalidateQueries({ queryKey: [...QueryKeys.orders, variables.id] });
+      queryClient.invalidateQueries({ queryKey: QueryKeys.receiptDetails(variables.id) });
+      toast.success(response.message || "Delivery charge updated successfully");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
+    },
+  });
+}
+
 // Hook to fetch receipt details for an order
 export function useReceiptDetails(orderId: string) {
   return useQuery({
@@ -96,9 +118,10 @@ export function useGenerateReceipt() {
       return response;
     },
     onSuccess: (response, orderId) => {
+      queryClient.invalidateQueries({ queryKey: QueryKeys.orders });
       queryClient.invalidateQueries({ queryKey: QueryKeys.receiptDetails(orderId) });
       queryClient.invalidateQueries({ queryKey: [...QueryKeys.orders, orderId] });
-      toast.success(response.message || "Receipt generated successfully");
+      toast.success(response.message || "Receipt generated and order confirmed successfully");
     },
     onError: (error: unknown) => {
       toast.error(getErrorMessage(error));

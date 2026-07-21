@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, Eye } from "lucide-react";
+import { MoreHorizontal, Eye, Truck } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -15,9 +15,10 @@ import type { Order } from "@/lib/types/book";
 interface OrderActionsProps {
   order: Order;
   onView?: () => void;
+  onSetShipping?: () => void;
 }
 
-export function OrderActions({ onView }: OrderActionsProps) {
+export function OrderActions({ onView, onSetShipping }: OrderActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -31,6 +32,12 @@ export function OrderActions({ onView }: OrderActionsProps) {
           <Eye className="mr-2 h-4 w-4" />
           View
         </DropdownMenuItem>
+        {onSetShipping && (
+          <DropdownMenuItem onClick={onSetShipping}>
+            <Truck className="mr-2 h-4 w-4" />
+            Set Delivery Charge
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
