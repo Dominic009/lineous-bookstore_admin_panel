@@ -51,7 +51,7 @@
 
 :root {
   /* ===== CORE COLORS ===== */
-  --background: oklch(0.98 0.003 90);
+  --background: oklch(0.98 0.003 260);
   --foreground: oklch(0.18 0.02 260);
   
   --card: oklch(1 0 0);
