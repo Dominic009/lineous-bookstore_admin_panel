@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { useDeletePublication } from "@/lib/hooks/use-publications";
 import { PublicationsTable } from "@/components/publications/publications-table";
 import { PublicationDialog } from "@/components/publications/publication-dialog";
 import type { Publication } from "@/lib/types/book";
@@ -31,13 +32,17 @@ export default function PublicationsPage() {
     setIsEditDialogOpen(true);
   };
 
+  const deleteMutation = useDeletePublication();
+
   const handleDelete = (publication: Publication) => {
     setSelectedPublication(publication);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // The delete is handled in the PublicationsTable component
+  const handleDeleteConfirm = async () => {
+    if (selectedPublication) {
+      await deleteMutation.mutateAsync(selectedPublication.id);
+    }
     setIsDeleteDialogOpen(false);
     setSelectedPublication(null);
   };

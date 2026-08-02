@@ -1,6 +1,6 @@
 "use client";
 
-import { useSubjects, useDeleteSubject, useUpdateSubject } from "@/lib/hooks/use-subjects";
+import { useSubjects, useUpdateSubject } from "@/lib/hooks/use-subjects";
 import type { Subject } from "@/lib/types/book";
 import { SubjectActions } from "./subject.actions";
 import { toast } from "sonner";
@@ -12,11 +12,9 @@ interface SubjectsTableProps {
 
 export function SubjectsTable({ onEdit, onDelete }: SubjectsTableProps) {
   const { data: subjects, isLoading, error } = useSubjects();
-  const deleteMutation = useDeleteSubject();
   const updateMutation = useUpdateSubject();
 
-  const handleDelete = async (subject: Subject) => {
-    await deleteMutation.mutateAsync(subject.id);
+  const handleDelete = (subject: Subject) => {
     onDelete?.(subject);
   };
 

@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { useDeleteSubject } from "@/lib/hooks/use-subjects";
 import { SubjectsTable } from "@/components/subjects/subjects-table";
 import { SubjectDialog } from "@/components/subjects/subject-dialog";
 import type { Subject } from "@/lib/types/book";
@@ -31,13 +32,17 @@ export default function SubjectsPage() {
     setIsEditDialogOpen(true);
   };
 
+  const deleteMutation = useDeleteSubject();
+
   const handleDelete = (subject: Subject) => {
     setSelectedSubject(subject);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // The delete is handled in the SubjectsTable component
+  const handleDeleteConfirm = async () => {
+    if (selectedSubject) {
+      await deleteMutation.mutateAsync(selectedSubject.id);
+    }
     setIsDeleteDialogOpen(false);
     setSelectedSubject(null);
   };

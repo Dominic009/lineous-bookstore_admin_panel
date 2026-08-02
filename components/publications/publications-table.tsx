@@ -1,6 +1,6 @@
 "use client";
 
-import { usePublications, useDeletePublication, useUpdatePublication } from "@/lib/hooks/use-publications";
+import { usePublications, useUpdatePublication } from "@/lib/hooks/use-publications";
 import type { Publication } from "@/lib/types/book";
 import { PublicationActions } from "./publication.actions";
 import { StatusBadge } from "@/components/books/status-badge";
@@ -13,11 +13,9 @@ interface PublicationsTableProps {
 
 export function PublicationsTable({ onEdit, onDelete }: PublicationsTableProps) {
   const { data: publications, isLoading, error } = usePublications();
-  const deleteMutation = useDeletePublication();
   const updateMutation = useUpdatePublication();
 
-  const handleDelete = async (publication: Publication) => {
-    await deleteMutation.mutateAsync(publication.id);
+  const handleDelete = (publication: Publication) => {
     onDelete?.(publication);
   };
 

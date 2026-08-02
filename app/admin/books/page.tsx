@@ -22,6 +22,7 @@ import { BookDialog } from "@/components/books/book-dialog";
 import { InventoryStats } from "@/components/books/inventory-stats";
 import { LowStockAlert } from "@/components/books/low-stock-alert";
 import type { Book } from "@/lib/types/book";
+import { useDeleteBook } from "@/lib/hooks/use-books";
 import { useInventoryOverview } from "@/lib/hooks/use-inventory";
 
 export default function BooksPage() {
@@ -33,6 +34,7 @@ export default function BooksPage() {
 
   const { data: inventoryData, isLoading: inventoryLoading } =
     useInventoryOverview();
+  const deleteMutation = useDeleteBook();
 
   const handleView = (book: Book) => {
     router.push(`/admin/books/${book.id}`);
@@ -48,8 +50,10 @@ export default function BooksPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // The delete is handled in the BooksTable component
+  const handleDeleteConfirm = async () => {
+    if (selectedBook) {
+      await deleteMutation.mutateAsync(selectedBook.id);
+    }
     setIsDeleteDialogOpen(false);
     setSelectedBook(null);
   };

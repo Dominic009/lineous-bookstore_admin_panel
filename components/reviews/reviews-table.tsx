@@ -1,6 +1,6 @@
 "use client";
 
-import { useReviews, useDeleteReview } from "@/lib/hooks/use-reviews";
+import { useReviews } from "@/lib/hooks/use-reviews";
 import type { Review } from "@/lib/types/book";
 import { ReviewActions } from "./review.actions";
 
@@ -12,10 +12,8 @@ interface ReviewsTableProps {
 
 export function ReviewsTable({ bookId, onEdit, onDelete }: ReviewsTableProps) {
   const { data: reviews, isLoading, error } = useReviews(bookId);
-  const deleteMutation = useDeleteReview();
 
-  const handleDelete = async (review: Review) => {
-    await deleteMutation.mutateAsync(review.id);
+  const handleDelete = (review: Review) => {
     onDelete?.(review);
   };
 

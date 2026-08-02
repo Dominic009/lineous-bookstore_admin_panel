@@ -1,6 +1,6 @@
 "use client";
 
-import { useUsers, useDeleteUser } from "@/lib/hooks/use-users";
+import { useUsers } from "@/lib/hooks/use-users";
 import type { User } from "@/lib/types/book";
 import { UserActions, UserRoleBadge, UserStatusBadge } from "./user.actions";
 
@@ -12,10 +12,8 @@ interface UsersTableProps {
 
 export function UsersTable({ onView, onEdit, onDelete }: UsersTableProps) {
   const { data: users, isLoading, error } = useUsers();
-  const deleteMutation = useDeleteUser();
 
-  const handleDelete = async (user: User) => {
-    await deleteMutation.mutateAsync(user.id);
+  const handleDelete = (user: User) => {
     onDelete?.(user);
   };
 

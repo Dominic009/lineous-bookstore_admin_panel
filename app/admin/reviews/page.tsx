@@ -19,6 +19,7 @@ import { SearchableDropdown } from "@/components/ui/searchable-dropdown";
 import { ReviewsTable } from "@/components/reviews/reviews-table";
 import { ReviewDialog } from "@/components/reviews/review-dialog";
 import { useBooks } from "@/lib/hooks/use-books";
+import { useDeleteReview } from "@/lib/hooks/use-reviews";
 import type { Review } from "@/lib/types/book";
 
 export default function ReviewsPage() {
@@ -29,6 +30,7 @@ export default function ReviewsPage() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
 
   const { data: books = [] } = useBooks();
+  const deleteMutation = useDeleteReview();
 
   const handleEdit = (review: Review) => {
     setSelectedReview(review);
@@ -40,7 +42,10 @@ export default function ReviewsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
+    if (selectedReview) {
+      await deleteMutation.mutateAsync(selectedReview.id);
+    }
     setIsDeleteDialogOpen(false);
     setSelectedReview(null);
   };

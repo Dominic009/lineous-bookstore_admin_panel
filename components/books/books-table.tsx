@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { StatusBadge } from "./status-badge";
 import { BookActions } from "./book.actions";
-import { useBooks, useDeleteBook } from "@/lib/hooks/use-books";
+import { useBooks } from "@/lib/hooks/use-books";
 import type { Book } from "@/lib/types/book";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -20,10 +20,8 @@ interface BooksTableProps {
 export function BooksTable({ onView, onEdit, onDelete, onAddPaper }: BooksTableProps) {
   const router = useRouter();
   const { data: books, isLoading, error } = useBooks();
-  const deleteMutation = useDeleteBook();
 
-  const handleDelete = async (book: Book) => {
-    await deleteMutation.mutateAsync(book.id);
+  const handleDelete = (book: Book) => {
     onDelete?.(book);
   };
 

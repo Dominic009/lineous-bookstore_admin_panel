@@ -22,6 +22,7 @@ import { CustomerStats } from "@/components/users/customer-stats";
 import { TopCustomers } from "@/components/users/top-customers";
 import type { User, UserRole, UserStatus } from "@/lib/types/book";
 import { UserRole as UserRoleEnum, UserStatus as UserStatusEnum } from "@/constants/status";
+import { useDeleteUser } from "@/lib/hooks/use-users";
 import { useCustomerInsights } from "@/lib/hooks/use-analytics";
 
 export default function UsersPage() {
@@ -33,6 +34,7 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const { data: customerData, isLoading: customerLoading } = useCustomerInsights();
+  const deleteMutation = useDeleteUser();
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -44,7 +46,10 @@ export default function UsersPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
+    if (selectedUser) {
+      await deleteMutation.mutateAsync(selectedUser.id);
+    }
     setIsDeleteDialogOpen(false);
     setSelectedUser(null);
   };
