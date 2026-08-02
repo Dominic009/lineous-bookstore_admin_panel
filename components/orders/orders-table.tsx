@@ -66,16 +66,16 @@ export function OrdersTable({ onView }: OrdersTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
       <table className="w-full">
-        <thead>
+       <thead className="bg-gray-100 font-bold">
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">Order</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Customer</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Total</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Shipping</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">Order Status</th>
-            {/* <th className="px-6 py-4 font-medium text-muted-foreground">Payment</th> */}
-            <th className="px-6 py-4 font-medium text-muted-foreground">Date</th>
-            <th className="px-6 py-4 font-medium text-muted-foreground"></th>
+             <th className="px-6 py-4 font-semibold text-gray-500">Order</th>
+             <th className="px-6 py-4 font-semibold text-gray-500">Customer</th>
+             <th className="px-6 py-4 font-semibold text-gray-500">Total</th>
+             <th className="px-6 py-4 font-semibold text-gray-500">Shipping</th>
+             <th className="px-6 py-4 font-semibold text-gray-500">Order Status</th>
+            {/*  <th className="px-6 py-4 font-semibold text-gray-500">Payment</th> */}
+             <th className="px-6 py-4 font-semibold text-gray-500">Date</th>
+             <th className="px-6 py-4 font-semibold text-gray-500"></th>
           </tr>
         </thead>
 

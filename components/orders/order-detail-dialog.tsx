@@ -225,7 +225,7 @@ function OrderItemsTable({ order }: { order: Order }) {
   return (
     <div className="overflow-hidden rounded-xl border border-border/60">
       <table className="w-full text-sm">
-        <thead>
+       <thead className="bg-gray-100 font-bold">
           <tr className="border-b border-border/60 bg-muted/30 text-left text-muted-foreground">
             <th className="px-4 py-3 font-medium">Book</th>
             <th className="px-4 py-3 font-medium">Paper</th>

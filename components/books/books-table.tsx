@@ -62,30 +62,30 @@ export function BooksTable({ onView, onEdit, onDelete, onAddPaper }: BooksTableP
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
       <table className="w-full">
-        <thead>
+        <thead className="bg-gray-100 font-bold">
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Book
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Publication
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Subject
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Price Range
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Papers
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Status
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+            <th className="px-6 py-4 font-semibold text-gray-500">
               Actions
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground"></th>
+            <th className="px-6 py-4 font-semibold text-gray-500"></th>
           </tr>
         </thead>
 

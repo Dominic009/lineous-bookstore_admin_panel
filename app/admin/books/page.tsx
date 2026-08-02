@@ -93,7 +93,7 @@ export default function BooksPage() {
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search books..."
-            className="h-10 rounded-md border-border/60 bg-muted/30 pl-10 pr-4"
+            className="h-10 rounded-md border-border/60 bg-popover pl-10 pr-4"
           />
         </div>
 

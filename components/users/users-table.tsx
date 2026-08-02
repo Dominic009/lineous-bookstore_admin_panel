@@ -46,27 +46,27 @@ export function UsersTable({ onView, onEdit, onDelete }: UsersTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
       <table className="w-full">
-        <thead>
+       <thead className="bg-gray-100 font-bold">
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               User
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Email
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Role
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Status
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Provider
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Created
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground"></th>
+             <th className="px-6 py-4 font-semibold text-gray-500"></th>
           </tr>
         </thead>
 

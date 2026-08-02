@@ -20,7 +20,7 @@ export function Navbar() {
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search anything..."
-            className="h-10 rounded-md border-border/60 bg-muted/30 pl-10 pr-4 text-sm"
+            className="h-10 rounded-md border-border/60 bg-popover pl-10 pr-4 text-sm"
           />
         </div>
       </div> */}

@@ -46,24 +46,24 @@ export function ReviewsTable({ bookId, onEdit, onDelete }: ReviewsTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
       <table className="w-full">
-        <thead>
+       <thead className="bg-gray-100 font-bold">
           <tr className="border-b border-border/60 bg-muted/30 text-left text-sm">
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Reviewer
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Designation
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Rating
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Comment
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground">
+             <th className="px-6 py-4 font-semibold text-gray-500">
               Order
             </th>
-            <th className="px-6 py-4 font-medium text-muted-foreground"></th>
+             <th className="px-6 py-4 font-semibold text-gray-500"></th>
           </tr>
         </thead>
 
