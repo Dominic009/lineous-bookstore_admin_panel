@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, Search, SlidersHorizontal, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,15 +135,15 @@ export default function BooksPage() {
             <AlertDialogTitle>Delete Book</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete &quot;{selectedBook?.title}&quot;?
-              This action will soft delete the book.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground"
+              className="bg-destructive text-white flex items-center gap-3 cursor-pointer"
             >
+              <Trash2 />
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

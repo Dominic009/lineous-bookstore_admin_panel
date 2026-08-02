@@ -99,7 +99,7 @@ export default function SubjectsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Subject</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &#34;{selectedSubject?.name}&#34;? This action will soft delete the subject.
+              Are you sure you want to delete &#34;{selectedSubject?.name}&#34;? This will also delete all related books. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, Search, SlidersHorizontal, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,8 @@ export default function PublicationsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
+  const [selectedPublication, setSelectedPublication] =
+    useState<Publication | null>(null);
 
   const handleEdit = (publication: Publication) => {
     setSelectedPublication(publication);
@@ -94,20 +95,32 @@ export default function PublicationsPage() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Publication</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete &#34;{selectedPublication?.name}&#34;? This action will soft delete the publication.
+            <AlertDialogDescription className="leading-relaxed">
+              Are you sure you want to delete{" "}
+              <i>
+                <b>&#34;{selectedPublication?.name}</b>
+              </i>
+              &#34;? <br />{" "}
+              <span className="font-medium">
+                This will also delete all related subjects and books.
+                This action cannot be undone.
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="mt-4">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground"
+              className="bg-destructive text-white flex items-center gap-3 cursor-pointer mt-4"
             >
+              <Trash2 />
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

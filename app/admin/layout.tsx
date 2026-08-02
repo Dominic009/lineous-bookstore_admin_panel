@@ -15,7 +15,7 @@ export default function DashboardLayout({
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-sidebar-foreground">
+      <div className="flex min-h-screen bg-gray-100">
         <Sidebar />
 
         <div className="flex flex-1 flex-col">
