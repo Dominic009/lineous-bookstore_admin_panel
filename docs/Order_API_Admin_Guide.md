@@ -347,11 +347,20 @@ CANCELLED   RETURNED
 
 ## Receipt Features
 
-- **Auto-generation**: Receipts are automatically generated when an order is created
+- **Explicit generation**: Receipts are generated on demand via `POST /orders/:id/receipt`. They are **not** automatically created when an order is placed. An order record existing in the database does not imply a receipt record exists.
 - **QR Code**: Each receipt contains a QR code for verification
 - **Cloud Storage**: PDFs are stored on Cloudinary for reliable access
 - **Professional Template**: HTML-based template with branded design
 - **Regeneration**: Admins can regenerate receipts if needed
+
+### Receipt Lifecycle
+
+1. An order is created (`POST /orders`) — no receipt is generated at this point.
+2. The admin sets a delivery charge (`PATCH /orders/:id/shipping`) if needed.
+3. The admin generates a receipt (`POST /orders/:id/receipt`) — this creates the receipt record and PDF.
+4. The admin can then download the PDF (`GET /orders/:id/receipt`) or view details (`GET /orders/:id/receipt/details`).
+
+> **Note:** Calling `GET /orders/:id/receipt` (download) before a receipt has been generated will return `404 Not Found`. The admin panel's download action handles this by generating the receipt first if it does not yet exist.
 
 ## Error Responses
 
@@ -361,6 +370,15 @@ CANCELLED   RETURNED
   "message": "Order not found",
   "status": "error",
   "error": "Not Found"
+}
+```
+
+When a receipt has not been generated for an order, the download and details endpoints return:
+```json
+{
+  "message": "Receipt not found",
+  "error": "Not Found",
+  "statusCode": 404
 }
 ```
 

@@ -130,9 +130,22 @@ export function useGenerateReceipt() {
 }
 
 // Hook to download a receipt PDF (triggers a browser download)
+// If no receipt exists yet, it generates one first before downloading.
 export function useDownloadReceipt() {
   return useMutation({
     mutationFn: async (orderId: string) => {
+      // Check whether a receipt already exists for this order.
+      try {
+        await ordersApi.getReceiptDetails(orderId);
+      } catch (error) {
+        // If the receipt does not exist (404), generate it before downloading.
+        if (error instanceof AxiosError && error.response?.status === 404) {
+          await ordersApi.generateReceipt(orderId);
+        } else {
+          throw error;
+        }
+      }
+      // Now that a receipt is guaranteed to exist, download the PDF.
       return await ordersApi.downloadReceipt(orderId);
     },
     onSuccess: (blob, orderId) => {
